@@ -1,0 +1,236 @@
+#  Licensed to the Apache Software Foundation (ASF) under one or more
+#  contributor license agreements.  See the NOTICE file distributed with
+#  this work for additional information regarding copyright ownership.
+#  The ASF licenses this file to You under the Apache License, Version 2.0
+#  (the "License"); you may not use this file except in compliance with
+#  the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - 'examples/**/*'
+    - 'skywalking_ruby.gemspec'
+    - 'lib/skywalking_ruby/proto/**/*'
+    - 'vendor/**/*'
+  TargetRubyVersion: 3.0
+
+require:
+  - rubocop-performance
+
+#####
+# Style
+#####
+Style/Alias:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/RescueModifier:
+  Enabled: false
+
+Style/NumericLiterals:
+  Enabled: false
+
+Style/FormatStringToken:
+  Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
+
+Style/EmptyMethod:
+  Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false
+
+Style/HashSyntax:
+  Enabled: false
+
+Style/PerlBackrefs:
+  Enabled: false
+
+Style/SpecialGlobalVars:
+  Enabled: false
+
+Style/MissingRespondToMissing:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/DocumentationMethod:
+  Enabled: false
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/RescueStandardError:
+  Enabled: false
+
+Style/SoleNestedConditional:
+  Enabled: false
+
+Style/StringConcatenation:
+  Enabled: false
+
+Style/SafeNavigation:
+  Enabled: false
+
+Style/DocumentDynamicEvalDefinition:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Style/CaseEquality:
+  Enabled: false
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
+
+Style/Lambda:
+  Enabled: false
+
+Style/ArgumentsForwarding:
+  Enabled: false
+
+Style/RedundantBegin:
+  Enabled: false
+
+Style/SymbolProc:
+  Enabled: false
+
+Style/ExplicitBlockArgument:
+  Enabled: false
+
+#####
+# Lint
+#####
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+Lint/RescueException:
+  Enabled: false
+
+Lint/SuppressedException:
+  Enabled: false
+
+Lint/ConstantDefinitionInBlock:
+  Enabled: false
+
+Lint/EmptyClass:
+  Enabled: false
+
+Lint/NoReturnInBeginEndBlocks:
+  Enabled: false
+
+Lint/LambdaWithoutLiteralBlock:
+  Enabled: true
+
+Lint/MissingSuper:
+  Enabled: false
+
+Lint/DuplicateBranch:
+  Enabled: false
+
+Lint/IncompatibleIoSelectWithFiberScheduler:
+  Enabled: false
+
+#####
+# Layout
+#####  
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/ParameterAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/TrailingEmptyLines:
+  Enabled: false
+
+Layout/TrailingWhitespace:
+  Enabled: false
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+Layout/FirstParameterIndentation:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 128
+
+Layout/RescueEnsureAlignment:
+  Enabled: true
+
+#####
+# Metrics
+#####
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/BlockNesting:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+#####
+# Naming
+##### 
+Naming/AccessorMethodName:
+  Enabled: false
+
+Naming/MemoizedInstanceVariableName:
+  Enabled: false
+  
+Naming/ConstantName:
+  Enabled: false
+
+#####
+# Performance
+#####
+Performance/Casecmp:
+  Enabled: false
+
+Performance/CollectionLiteralInLoop:
+  Enabled: true
