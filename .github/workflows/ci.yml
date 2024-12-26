@@ -51,9 +51,8 @@ jobs:
           gem install bundler
           bundle --version
 
-  required:
+  CheckStatus:
     if: always()
-    name: Required
     needs:
       - build
     runs-on: ubuntu-latest
