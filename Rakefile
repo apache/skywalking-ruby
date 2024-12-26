@@ -14,7 +14,7 @@
 #  limitations under the License.
 
 ROOT_DIR = File.expand_path('', __dir__)
-OUT_DIR = File.join(ROOT_DIR, 'lib', 'skywalking_ruby/proto/')
+OUT_DIR = File.join(ROOT_DIR, 'lib', 'skywalking/proto/')
 
 task :gen_protos do
   system "gem install grpc grpc-tools"

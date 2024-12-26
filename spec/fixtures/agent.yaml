@@ -23,4 +23,4 @@ instance_name: Your_InstanceName
 collector_discard: false
 # The gRPC server address of the backend service.
 collector_backend_service: 127.0.0.1:11800
-config_file: config/skywalking_ruby.yaml
+config_file: config/skywalking.yaml

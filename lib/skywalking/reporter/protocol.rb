@@ -13,8 +13,16 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-source 'https://rubygems.org'
-
-gemspec name: 'skywalking'
-
-ruby ">= 3.0.0"
+module Skywalking
+  module Reporter
+    class Protocol
+      def report_heartbeat
+        raise NotImplementedError 'The report_heartbeat method has not been implemented'
+      end
+      
+      def report_segment
+        raise NotImplementedError 'The report_segment method has not been implemented'
+      end
+    end
+  end
+end

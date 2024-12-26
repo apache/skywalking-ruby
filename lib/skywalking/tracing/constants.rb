@@ -13,8 +13,37 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-source 'https://rubygems.org'
+module Skywalking
+  module Tracing
+    module Component
+      Unknown = 0
+      Redis = 7
+      General = 12000
+      Sinatra = 12001
+    end
 
-gemspec name: 'skywalking'
+    module Layer
+      Unknown = 0
+      Database = 1
+      RPCFramework = 2
+      Http = 3
+      MQ = 4
+      Cache = 5
+      FAAS = 6
+    end
 
-ruby ">= 3.0.0"
+    module Kind
+      Local = 0
+      Entry = 1
+      Exit = 2
+    end
+
+    def self.find_mapping(category, value)
+      category.constants.each do |const_name|
+        return const_name if category.const_get(const_name) == value
+      end
+
+      'Unknown'
+    end
+  end
+end

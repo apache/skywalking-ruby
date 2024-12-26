@@ -13,8 +13,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-source 'https://rubygems.org'
+require_relative 'span'
 
-gemspec name: 'skywalking'
+module Skywalking
+  module Tracing
+    class NoopSpan < Span
+      def initialize(context: nil)
+        super(context: context, operation: '', kind: Tracing::Kind::EXIT)
+      end
 
-ruby ">= 3.0.0"
+      def extract(carrier) end
+
+      def inject
+        Carrier.new
+      end
+    end
+  end
+end

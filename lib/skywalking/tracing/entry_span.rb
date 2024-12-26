@@ -13,8 +13,36 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-source 'https://rubygems.org'
+require_relative 'span'
 
-gemspec name: 'skywalking'
+module Skywalking
+  module Tracing
+    class EntrySpan < Span
+      def initialize(
+        context:,
+        span_id: -1,
+        parent_id: -1,
+        operation: nil,
+        peer: nil,
+        component: nil,
+        layer: nil
+      )
+        super(context: context, span_id: span_id, parent_id: parent_id,
+              operation: operation, peer: peer, kind: Kind::Entry,
+              component: component, layer: layer)
 
-ruby ">= 3.0.0"
+        @current_max_depth = 0
+      end
+
+      def start
+        super
+
+        @current_max_depth = @stack_depth
+        @component = Component::Unknown
+        @layer = Layer::Unknown
+        @lags = []
+        @tags = Hash.new { |hash, key| hash[key] = [] }
+      end
+    end
+  end
+end

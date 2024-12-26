@@ -13,8 +13,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-source 'https://rubygems.org'
+module Skywalking
+  module Tracing
+    class CarrierItem
+      attr_accessor :key, :value
 
-gemspec name: 'skywalking'
-
-ruby ">= 3.0.0"
+      def initialize(key: '', value: '')
+        @key = key
+        @value = value
+      end
+    end
+  end
+end

@@ -15,7 +15,7 @@
 
 require 'spec_helper'
 
-module SkywalkingRuby
+module Skywalking
   RSpec.describe Configuration do
     it 'load DEFAULTS' do
       config = Configuration.new

@@ -13,8 +13,22 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-source 'https://rubygems.org'
+require_relative 'span_context'
 
-gemspec name: 'skywalking'
+module Skywalking
+  module Tracing
+    class IgnoredContext < SpanContext
+      def initialize(context)
+        Span.new(context: context, operation: '', kind: Kind::Local)
+      end
 
-ruby ">= 3.0.0"
+      def self.inject
+        Carrier.new
+      end
+
+      def self.extract(carrier)
+        nil
+      end
+    end
+  end
+end

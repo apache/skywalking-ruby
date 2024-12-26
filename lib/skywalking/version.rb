@@ -13,8 +13,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-source 'https://rubygems.org'
-
-gemspec name: 'skywalking'
-
-ruby ">= 3.0.0"
+module Skywalking
+  VERSION = "0.0.0-rc".freeze
+end

@@ -17,8 +17,8 @@ AllCops:
   NewCops: enable
   Exclude:
     - 'examples/**/*'
-    - 'skywalking_ruby.gemspec'
-    - 'lib/skywalking_ruby/proto/**/*'
+    - 'skywalking.gemspec'
+    - 'lib/skywalking/proto/**/*'
     - 'vendor/**/*'
   TargetRubyVersion: 3.0
 

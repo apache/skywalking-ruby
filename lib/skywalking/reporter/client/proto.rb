@@ -13,8 +13,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-source 'https://rubygems.org'
+require_relative '../../proto/management/Management_services_pb'
+require_relative '../../proto/language-agent/Tracing_services_pb'
+require_relative '../../proto/language-agent/Tracing_pb'
 
-gemspec name: 'skywalking'
-
-ruby ">= 3.0.0"
+module Skywalking
+  ManagementServiceStub = Skywalking::V3::ManagementService::Stub
+  InstanceProperties = Skywalking::V3::InstanceProperties
+  InstancePingPkg = Skywalking::V3::InstancePingPkg
+  TraceSegmentReportServiceStub = Skywalking::V3::TraceSegmentReportService::Stub
+  SegmentObject = Skywalking::V3::SegmentObject
+  SpanObject = Skywalking::V3::SpanObject
+  SegmentReference = Skywalking::V3::SegmentReference
+  KeyStringValuePair = Skywalking::V3::KeyStringValuePair
+end

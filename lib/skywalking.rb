@@ -13,8 +13,24 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-source 'https://rubygems.org'
+require_relative 'skywalking/log/logger'
+require_relative 'skywalking/agent'
 
-gemspec name: 'skywalking'
+module Skywalking
+  class << self
+    def start(config = nil)
+      if started?
+        return
+      end
+      Agent.start(config)
+    end
 
-ruby ">= 3.0.0"
+    def started?
+      Agent.started?
+    end
+
+    def stop
+      Agent.stop
+    end
+  end
+end

@@ -13,8 +13,18 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-source 'https://rubygems.org'
+require 'securerandom'
 
-gemspec name: 'skywalking'
+module Skywalking
+  module Utils
+    class IDGen
+      def initialize(raw_id: nil)
+        @value = raw_id || SecureRandom.uuid.delete('-')
+      end
 
-ruby ">= 3.0.0"
+      def to_s
+        @value
+      end
+    end
+  end
+end

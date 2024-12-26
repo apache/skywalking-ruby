@@ -13,14 +13,41 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-require 'spec_helper'
-require 'skywalking/utils/id_gen'
-
 module Skywalking
-  RSpec.describe Utils::IDGen do
-    it 'succeeds' do
-      id = described_class.new
-      expect(id.to_s).to_not be_empty
+  module Log
+    module Logging
+      def info(msg, *args)
+        log(:info, msg, *args)
+      end
+
+      def debug(msg, *args)
+        log(:debug, msg, *args)
+      end
+
+      def warn(msg, *args)
+        log(:warn, msg, *args)
+      end
+
+      def error(msg, *args)
+        log(:error, msg, *args)
+      end
+
+      def log(level, msg, *args)
+        logger = Configuration.new.logger
+        if logger
+          if logger.respond_to?(level)
+            if args.empty?
+              logger.send(level, msg)
+            else
+              logger.send(level, format(msg, *args))
+            end
+          else
+            Kernel.warn("Unknown log level: #{level}")
+          end
+        end
+      rescue Exception => e
+        puts "log exception: #{e.message}"
+      end
     end
   end
 end

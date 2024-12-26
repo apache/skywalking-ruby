@@ -5,7 +5,7 @@ This documentation guides the release manager to release the SkyWalking Ruby in 
 ## Prerequisites
 
 1. Close (if finished, or move to next milestone otherwise) all issues in the current milestone from [skywalking-ruby](https://github.com/apache/skywalking-ruby/milestones) and [skywalking](https://github.com/apache/skywalking/milestones), create a new milestone for the next release.
-1. Update [CHANGELOG.md](../CHANGELOG.md) and `version` in [Version.rb](../lib/skywalking_ruby/version.rb).
+1. Update [CHANGELOG.md](../CHANGELOG.md) and `version` in [Version.rb](../lib/skywalking/version.rb).
 
 
 ## Add your GPG public key to Apache svn

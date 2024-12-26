@@ -16,8 +16,8 @@
 require 'sinatra'
 require 'redis'
 
-require_relative '../../lib/skywalking_ruby'
-SkywalkingRuby.start
+require_relative '../../lib/skywalking'
+Skywalking.start
 
 get '/sw' do
   "Hello, SkyWalking!"

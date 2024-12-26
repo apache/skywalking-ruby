@@ -13,8 +13,37 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-source 'https://rubygems.org'
+module Skywalking
+  module Tracing
+    class Tag
+      attr_accessor :val
+      attr_reader :key, :insert
 
-gemspec name: 'skywalking'
+      def initialize(val)
+        @val = val.to_s
+        @insert = true
+      end
+    end
 
-ruby ">= 3.0.0"
+    class TagHttpMethod < Tag
+      def initialize(val)
+        super
+        @key = 'http.method'
+      end
+    end
+    
+    class TagHttpURL < Tag
+      def initialize(val)
+        super
+        @key = 'http.url'
+      end
+    end
+
+    class TagDbType < Tag
+      def initialize(val)
+        super
+        @key = 'db.type'
+      end
+    end
+  end
+end
