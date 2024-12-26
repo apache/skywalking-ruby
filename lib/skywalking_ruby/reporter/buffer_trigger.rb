@@ -62,7 +62,7 @@ module SkywalkingRuby
       def stream_data
         return enum_for(:stream_data) unless block_given?
 
-        unless closed?
+        until closed?
           segment = @buffer.pop(false)
           unless segment.nil?
             yield(generate_segment(segment))
