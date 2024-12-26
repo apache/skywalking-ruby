@@ -30,9 +30,3 @@ get '/hello/:name' do
   puts "Value of 'hello': #{value}"
   "Hello #{params[:name]}!"
 end
-
-
-
-
-
-

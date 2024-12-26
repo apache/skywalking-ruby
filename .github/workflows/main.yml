@@ -17,9 +17,12 @@
 name: Ruby
 
 on:
+  pull_request:
   push:
     branches:
       - main
+  schedule:
+    - cron: '0 18 * * *'
 
 jobs:
   build:

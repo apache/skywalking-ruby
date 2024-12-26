@@ -148,7 +148,6 @@ module SkywalkingRuby
         @n_spans -= 1
         if @n_spans.zero?
           Reporter::Report.trigger << @segment
-          Agent.segment_signal_ready
           return true
         end
 

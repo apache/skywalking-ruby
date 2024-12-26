@@ -22,8 +22,6 @@ module SkywalkingRuby
     class Report
       def initialize(config)
         @config = config
-        @mutex = Mutex.new
-        @condition = ConditionVariable.new
         init_proto
       end
 
@@ -49,19 +47,10 @@ module SkywalkingRuby
 
         @@trigger = BufferTrigger.new(@config)
         @daemon_loop << Thread.new do
-          @mutex.synchronize do
-            @condition.wait(@mutex)
-          end
           report_segment
         end
       end
-      
-      def signal_ready
-        @mutex.synchronize do
-          @condition.signal
-        end
-      end
-      
+
       def self.trigger
         @@trigger
       end
@@ -79,7 +68,6 @@ module SkywalkingRuby
             daemon.join
           end
         end
-        @protocol.shutdown
       end
 
       def report_heartbeat
@@ -87,7 +75,7 @@ module SkywalkingRuby
       end
 
       def report_segment
-        @protocol.report_segment(@@trigger.stream_data)
+        @protocol.report_segment(@@trigger.stream_data) until @@trigger.closed?
       end
     end
   end

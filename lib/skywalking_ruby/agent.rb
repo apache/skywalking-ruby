@@ -62,10 +62,6 @@ module SkywalkingRuby
       def config
         @config ||= Configuration.new.agent_config
       end
-      
-      def segment_signal_ready
-        @agent&.reporter&.signal_ready
-      end
     end
 
     attr_reader :plugins, :logger, :reporter

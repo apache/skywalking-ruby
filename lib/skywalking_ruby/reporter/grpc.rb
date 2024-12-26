@@ -41,11 +41,6 @@ module SkywalkingRuby
       def report_segment(enumerator)
         @trace_client.report_segment(enumerator)
       end
-
-      def shutdown
-        @ms_client.close
-        @trace_client.close
-      end
     end
   end
 end

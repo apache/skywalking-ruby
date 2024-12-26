@@ -52,21 +52,20 @@ module SkywalkingRuby
           @closed = true
         end
       end
-      
+
       def closed?
-        @mutex.synchronize do
-          @closed
-        end
+        @closed
       end
 
       def stream_data
-        return enum_for(:stream_data) unless block_given?
-
-        until closed?
+        begin
           segment = @buffer.pop(false)
-          unless segment.nil?
-            yield(generate_segment(segment))
-          end
+        rescue ThreadError
+          return nil
+        end
+
+        Enumerator.new do |yie|
+          yie << generate_segment(segment) unless segment.nil?
         end
       end
 
