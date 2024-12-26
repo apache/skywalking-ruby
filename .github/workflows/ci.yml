@@ -14,26 +14,52 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Ruby
+name: CI
 
 on:
+  pull_request:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
+  schedule:
+    - cron: '0 18 * * *'
+
+concurrency:
+  group: CI-plugin-e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     name: Ruby ${{ matrix.ruby }}
     strategy:
+      fail-fast: true
       matrix:
         ruby:
-          - '3.2'
+          - 3.2
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Run Bundler
+        run: |
+          gem install bundler
+          bundle --version
+
+  CheckStatus:
+    if: always()
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Merge Requirement
+        run: |
+          if [[ ${{ needs.build.result }} != 'success' ]]; then
+            exit -1
+          fi
