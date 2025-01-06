@@ -25,13 +25,13 @@ module Skywalking
           end
 
           Tracing::ContextManager.new_entry_span(
-            operation: request.env['REQUEST_URI'].to_s,
+            operation: "#{req_method}:#{request.env['REQUEST_URI']}",
             carrier: carrier,
             inherit: Tracing::Component::General
           ) do |span|
             span&.tag(Tracing::TagHttpMethod.new(req_method))
             span&.tag(Tracing::TagHttpURL.new(request.env['REQUEST_URI']))
-            span&.layer = Tracing.find_mapping(Tracing::Layer, Tracing::Layer::Http)
+            span&.layer = Tracing::Layer::Http
             span&.peer = "#{request.env['SERVER_NAME']}:#{request.env['SERVER_PORT']}"
             span&.component = Tracing::Component::Sinatra
 

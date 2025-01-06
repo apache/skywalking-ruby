@@ -1,0 +1,73 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: e2e
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prep-build-plugin:
+    name: Build matrix
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      plugins: ${{ steps.plugins.outputs.plugins }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - id: plugins
+        run: echo "plugins=$(ls spec/scenarios | grep -v common | jq --raw-input | jq --slurp --compact-output)" >> "$GITHUB_OUTPUT"
+
+  e2e-test:
+    name: Run E2E Tests | ${{ matrix.plugin }} | Ruby ${{ matrix.ruby-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    needs: [ prep-build-plugin ]
+    strategy:
+      matrix:
+        plugin: ${{ fromJson(needs.prep-build-plugin.outputs.plugins) }}
+        ruby-version: [ "3.0" ]
+    env:
+      SW_RUBY_VERSION: ${{ matrix.ruby-version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Set up Ruby ${{ matrix.ruby-version }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+      - name: Install docker-compose
+        shell: bash
+        run: |
+          if ! command docker-compose 2>&1 > /dev/null; then
+            echo "Installing docker-compose"
+            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          fi
+      - name: Run E2E tests
+        run: |
+          gem install bundler && bundle
+          bundle exec rspec spec/scenarios/${{ matrix.plugin }}

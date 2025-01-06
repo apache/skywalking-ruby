@@ -13,30 +13,14 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-module Skywalking
-  module Tracing
-    module Component
-      Unknown = 0
-      Http = 2
-      Redis = 7
-      General = 12000
-      Sinatra = 12001
-    end
+require_relative '../../../lib/skywalking'
+require 'sinatra'
 
-    module Layer
-      Unknown = "Unknown".freeze
-      Database = "Database".freeze
-      RPCFramework = "RPCFramework".freeze
-      Http = "Http".freeze
-      MQ = "MQ".freeze
-      Cache = "Cache".freeze
-      FAAS = "FAAS".freeze
-    end
+Skywalking.start
 
-    module Kind
-      Local = "Local".freeze
-      Entry = "Entry".freeze
-      Exit = "Exit".freeze
-    end
-  end
+get "/execute" do
+  "Hello, SkyWalking!"
 end
+
+set :bind, '0.0.0.0'
+set :port, 8080

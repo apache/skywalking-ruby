@@ -87,7 +87,7 @@ module Skywalking
         return span if span
 
         parent = peek
-        info 'create new entry span'
+        debug 'create new entry span'
         if parent && parent.kind == Kind::Entry && inherit == parent.component
           span = parent
           span.operation = operation
@@ -104,7 +104,7 @@ module Skywalking
         return span if span
 
         parent = peek
-        info 'create new local span'
+        debug 'create new local span'
         new_span(Span, parent, operation: operation, kind: Kind::Local)
       end
 
@@ -113,7 +113,7 @@ module Skywalking
         return span if span
 
         parent = peek
-        info 'create new exit span'
+        debug 'create new exit span'
 
         if parent && parent.kind == Kind::Exit && inherit == parent.inherit
           span = parent

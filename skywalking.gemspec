@@ -13,44 +13,49 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-require File.expand_path("lib/skywalking/version", __dir__)
+require File.expand_path('lib/skywalking/version', __dir__)
 
 Gem::Specification.new do |spec|
-  spec.name = "skywalking"
+  spec.name = 'skywalking'
   spec.version = Skywalking::VERSION
-  spec.authors = ["Apache SkyWalking Team"]
-  spec.email = ["dev@skywalking.apache.org"]
+  spec.authors = ['Apache SkyWalking Team']
+  spec.email = ['dev@skywalking.apache.org']
 
-  spec.summary = "Skywalking Ruby"
-  spec.description = "The Ruby Agent for Apache SkyWalking"
-  spec.homepage = "https://skywalking.apache.org/"
-  spec.license = "Apache-2.0"
-  spec.required_ruby_version = ">= 3.0.0"
+  spec.summary = 'Skywalking Ruby Agent'
+  spec.description = 'The Ruby Agent for Apache SkyWalking'
+  spec.homepage = 'https://skywalking.apache.org/'
+  spec.license = 'Apache-2.0'
+  spec.required_ruby_version = '>= 3.0.0'
 
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/apache/skywalking-ruby"
-  spec.metadata["changelog_uri"] = "https://github.com/apache/skywalking-ruby/blob/main/CHANGELOG.md"
+  spec.metadata["source_code_uri"] = 'https://github.com/apache/skywalking-ruby'
+  spec.metadata["changelog_uri"] = 'https://github.com/apache/skywalking-ruby/blob/main/CHANGELOG.md'
 
-  # Specify which files should be added to the gem when it is released.
-  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
-  gemspec = File.basename(__FILE__)
-  spec.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
-    ls.readlines("\x0", chomp: true).reject do |f|
-      (f == gemspec) ||
-        f.start_with?(*%w[bin/ test/ spec/ features/ .git .github appveyor Gemfile])
+  files =
+    begin
+      `git ls-files`.split("\n")
+    rescue StandardError
+      Dir.glob("**/*", File::FNM_DOTMATCH).reject { |f| File.directory?(f) }
     end
-  end
-  spec.bindir = "exe"
+  spec.files = files
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
-  spec.require_paths = ["lib"]
+  spec.require_paths = ['lib']
 
-  # Uncomment to register a new dependency of your gem
-  spec.add_development_dependency "bundler"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec"
-  spec.add_development_dependency "rubocop"
-  spec.add_development_dependency "rubocop-performance"
-  spec.add_development_dependency "grpc"
-  spec.add_development_dependency "grpc-tools"
-  spec.add_development_dependency "rackup"
+  # Communication with OAP
+  spec.add_dependency 'grpc', '1.68.1'
+
+  # Base dev dependency
+  spec.add_development_dependency 'bundler', '>= 2.0'
+  spec.add_development_dependency 'rake', '13.2.1'
+  spec.add_development_dependency 'rspec', '~> 3'
+  spec.add_development_dependency 'rubocop', '1.69.2'
+  spec.add_development_dependency 'rubocop-performance', '1.23.0'
+  spec.add_development_dependency 'bigdecimal', '3.1.5'
+
+  # E2E test dependency
+  spec.add_development_dependency 'redis', '~> 5.0'
+  spec.add_development_dependency 'sinatra', '~> 4.1'
+  spec.add_development_dependency 'testcontainers-compose', '~> 0.2.0'
+  spec.add_development_dependency 'faraday', '~> 2.12'
+  spec.add_development_dependency 'rspec-wait', '~> 1.0'
 end

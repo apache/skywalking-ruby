@@ -26,7 +26,7 @@ module Skywalking
           def initialize(config)
             @config = config
             @management_service ||= ManagementServiceStub.new(
-              @config[:collector_backend_service],
+              @config[:collector_backend_services],
               :this_channel_is_insecure
             )
           end
@@ -97,7 +97,7 @@ module Skywalking
           def initialize(config)
             @config = config
             @trace_service ||= TraceSegmentReportServiceStub.new(
-              @config[:collector_backend_service],
+              @config[:collector_backend_services],
               :this_channel_is_insecure
             )
           end

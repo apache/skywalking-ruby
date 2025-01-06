@@ -14,5 +14,5 @@
 #  limitations under the License.
 
 module Skywalking
-  VERSION = "0.0.0-rc".freeze
+  VERSION = "0.0.0.beta1".freeze
 end

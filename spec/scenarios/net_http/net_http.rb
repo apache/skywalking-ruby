@@ -13,30 +13,21 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-module Skywalking
-  module Tracing
-    module Component
-      Unknown = 0
-      Http = 2
-      Redis = 7
-      General = 12000
-      Sinatra = 12001
-    end
+require_relative '../../../lib/skywalking'
+require 'net/http'
+require 'uri'
+require 'json'
 
-    module Layer
-      Unknown = "Unknown".freeze
-      Database = "Database".freeze
-      RPCFramework = "RPCFramework".freeze
-      Http = "Http".freeze
-      MQ = "MQ".freeze
-      Cache = "Cache".freeze
-      FAAS = "FAAS".freeze
-    end
+Skywalking.start
 
-    module Kind
-      Local = "Local".freeze
-      Entry = "Entry".freeze
-      Exit = "Exit".freeze
-    end
-  end
+url = URI.parse('http://httpbin.org/json?a=1')
+
+response = Net::HTTP.get_response(url)
+
+if response.is_a?(Net::HTTPSuccess)
+  puts JSON.pretty_generate(JSON.parse(response.body))
+else
+  puts "Error..."
 end
+
+sleep 10

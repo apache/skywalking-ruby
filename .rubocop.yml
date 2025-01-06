@@ -124,6 +124,12 @@ Style/SymbolProc:
 Style/ExplicitBlockArgument:
   Enabled: false
 
+Style/ClassVars:
+  Enabled: false
+  
+Style/CombinableDefined:
+  Enabled: false
+
 #####
 # Lint
 #####

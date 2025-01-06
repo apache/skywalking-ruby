@@ -13,30 +13,27 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-module Skywalking
-  module Tracing
-    module Component
-      Unknown = 0
-      Http = 2
-      Redis = 7
-      General = 12000
-      Sinatra = 12001
-    end
+RSpec.shared_context 'scenario value' do
+  let(:data_validate_url) { 'http://localhost:12800/dataValidate' }
+  let(:receive_data_url) { 'http://localhost:12800/receiveData' }
+end
 
-    module Layer
-      Unknown = "Unknown".freeze
-      Database = "Database".freeze
-      RPCFramework = "RPCFramework".freeze
-      Http = "Http".freeze
-      MQ = "MQ".freeze
-      Cache = "Cache".freeze
-      FAAS = "FAAS".freeze
-    end
+RSpec.shared_context 'compose' do
+  let(:client_url) { 'http://localhost:8080/execute' }
 
-    module Kind
-      Local = "Local".freeze
-      Entry = "Entry".freeze
-      Exit = "Exit".freeze
-    end
+  let(:compose) do
+    Testcontainers::ComposeContainer.new(
+      filepath: root_dir,
+      compose_filenames: ["docker-compose.yml"]
+    )
+  end
+
+  before(:each) do
+    compose.start
+    compose.wait_for_http(url: client_url, timeout: 600)
+  end
+
+  after(:each) do
+    compose.stop
   end
 end

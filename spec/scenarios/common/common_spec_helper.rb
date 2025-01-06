@@ -13,30 +13,28 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-module Skywalking
-  module Tracing
-    module Component
-      Unknown = 0
-      Http = 2
-      Redis = 7
-      General = 12000
-      Sinatra = 12001
-    end
+require 'testcontainers/compose'
+require 'faraday'
+require_relative 'validator'
 
-    module Layer
-      Unknown = "Unknown".freeze
-      Database = "Database".freeze
-      RPCFramework = "RPCFramework".freeze
-      Http = "Http".freeze
-      MQ = "MQ".freeze
-      Cache = "Cache".freeze
-      FAAS = "FAAS".freeze
-    end
+module CommonSpecHelper
+  include Validator
 
-    module Kind
-      Local = "Local".freeze
-      Entry = "Entry".freeze
-      Exit = "Exit".freeze
+  def test_plugin(plugin_name)
+    p "Now testing #{plugin_name} plugin"
+    expected_data = File.read(File.join(root_dir, 'expected.yml'))
+
+    with_retries do
+      resp = Faraday.post(data_validate_url) do |req|
+        req.body = expected_data
+        req.headers['Content-Type'] = 'application/x-yaml'
+      end
+      unless resp.status == 200
+        actual_data = Faraday.get(receive_data_url).body
+        raise "Data validation failed, actual Data: #{actual_data} and cause by: #{resp.body}"
+      end
     end
   end
 end
+
+
