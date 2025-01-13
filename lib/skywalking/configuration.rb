@@ -29,7 +29,7 @@ module Skywalking
         default: 'Your_InstanceName',
         desc: 'The name of this particular awesome Ruby service instance'
       },
-      :collector_backend_service => {
+      :collector_backend_services => {
         type: :string,
         default: '127.0.0.1:11800',
         desc: 'Backend service addresses'

@@ -1,3 +1,4 @@
+#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,13 +15,22 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+#
+header:
+  license:
+    spdx-id: Apache-2.0
+    copyright-owner: Apache Software Foundation
 
-# The service name in UI
-service_name: sw-ruby
-instance_name: Your_InstanceName  
+  paths-ignore:
+    - 'licenses'
+    - '**/*.md'
+    - 'LICENSE'
+    - 'NOTICE'
+    - '.github/PULL_REQUEST_TEMPLATE'
+    - '**/.gitignore'
+    - '.gitmodules'
+    - 'lib/skywalking/proto/**'
+    - 'examples/**'
+    - '.rspec'
 
-# Whether to enable the reporter
-collector_discard: false
-# The gRPC server address of the backend service.
-collector_backend_services: 127.0.0.1:11800
-config_file: config/skywalking.yaml
+  comment: on-failure

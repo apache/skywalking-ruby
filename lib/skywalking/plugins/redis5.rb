@@ -26,8 +26,9 @@ module Skywalking
             peer: _endpoint_info,
             component: Tracing::Component::Redis
           ) do |span|
-            span&.tag(Tracing::TagDbType.new("Redis"))
-            span&.layer = Tracing.find_mapping(Tracing::Layer, Tracing::Layer::Cache)
+            span&.tag(Tracing::TagCacheType.new("Redis"))
+            span&.tag(Tracing::TagCacheOp.new(operation))
+            span&.layer = Tracing::Layer::Cache
 
             super(args, &block)
           end

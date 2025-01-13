@@ -15,8 +15,8 @@
 
 require 'sinatra'
 require 'redis'
+require 'skywalking'
 
-require_relative '../../lib/skywalking'
 Skywalking.start
 
 get '/sw' do
@@ -27,6 +27,5 @@ get '/hello/:name' do
   redis = Redis.new(host: 'localhost', port: 6379)
   redis.set('hello', 'world')
   value = redis.get("hello")
-  puts "Value of 'hello': #{value}"
-  "Hello #{params[:name]}!"
+  "Hello #{value}!"
 end

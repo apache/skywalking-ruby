@@ -23,43 +23,48 @@ on:
       - main
     tags:
       - 'v*'
-  schedule:
-    - cron: '0 18 * * *'
 
 concurrency:
-  group: CI-plugin-e2e-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-check:
     runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }}
+    name: Ruby ${{ matrix.ruby-version }} | Build and Check
+    timeout-minutes: 60
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        ruby:
-          - 3.2
+        ruby-version: [ 3.0 ]
 
     steps:
-      - name: Set up Ruby
+      - name: Checkout source codes
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Set up Ruby ${{ matrix.ruby-version }}
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby }}
-          bundler-cache: true
-      - name: Run Bundler
+          ruby-version: ${{ matrix.ruby-version }}
+      - name: Check License
+        uses: apache/skywalking-eyes/header@3ea9df11bb3a5a85665377d1fd10c02edecf2c40
+      - name: Install system dependency
         run: |
           gem install bundler
-          bundle --version
+          bundler install
+      - name: RuboCop Linter
+        run: bundler exec rubocop
 
   CheckStatus:
     if: always()
     needs:
-      - build
+      - build-and-check
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Merge Requirement
         run: |
-          if [[ ${{ needs.build.result }} != 'success' ]]; then
+          if [[ ${{ needs.build-and-check.result }} != 'success' ]]; then
             exit -1
           fi

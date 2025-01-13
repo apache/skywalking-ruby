@@ -83,7 +83,7 @@ module Skywalking
               endTime: span.end_time,
               operationName: span.operation,
               peer: span.peer,
-              spanType: Tracing.find_mapping(Tracing::Kind, span.kind),
+              spanType: span.kind,
               spanLayer: span.layer,
               componentId: span.component,
               refs: span.refs.select { |ref| ref.trace_id }.map do |ref|

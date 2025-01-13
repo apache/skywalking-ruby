@@ -13,30 +13,29 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-module Skywalking
-  module Tracing
-    module Component
-      Unknown = 0
-      Http = 2
-      Redis = 7
-      General = 12000
-      Sinatra = 12001
-    end
+module Validator
+  def with_retries(retries: 3, backoff_max: 16, backoff_base: 1)
+    return if retries < 0
 
-    module Layer
-      Unknown = "Unknown".freeze
-      Database = "Database".freeze
-      RPCFramework = "RPCFramework".freeze
-      Http = "Http".freeze
-      MQ = "MQ".freeze
-      Cache = "Cache".freeze
-      FAAS = "FAAS".freeze
-    end
+    backoff ||= 0
 
-    module Kind
-      Local = "Local".freeze
-      Entry = "Entry".freeze
-      Exit = "Exit".freeze
+    yield if block_given?
+  rescue SystemExit, Interrupt
+    raise
+  rescue Exception => e
+    p e
+    if retries.zero?
+      p "Retries exhausted"
+      raise e
+    else
+      retries -= 1
+      backoff = [backoff == 0 ? 1 : backoff * 2, backoff_max].min
+      backoff *= 0.5 * (1 + Kernel.rand)
+      backoff = [backoff_base, backoff].max
+      p "Retrying in #{backoff} seconds"
+
+      sleep backoff
+      retry
     end
   end
 end

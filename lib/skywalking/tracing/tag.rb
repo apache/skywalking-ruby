@@ -31,7 +31,7 @@ module Skywalking
         @key = 'http.method'
       end
     end
-    
+
     class TagHttpURL < Tag
       def initialize(val)
         super
@@ -39,10 +39,45 @@ module Skywalking
       end
     end
 
+    class TagHttpStatusCode < Tag
+      def initialize(val)
+        super
+        @key = 'http.status_code'
+      end
+    end
+
     class TagDbType < Tag
       def initialize(val)
         super
         @key = 'db.type'
+      end
+    end
+
+    class TagCacheType < Tag
+      def initialize(val)
+        super
+        @key = 'cache.type'
+      end
+    end
+
+    class TagCacheOp < Tag
+      def initialize(val)
+        super
+        @key = 'cache.op'
+      end
+    end
+
+    class TagCacheCmd < Tag
+      def initialize(val)
+        super
+        @key = 'cache.cmd'
+      end
+    end
+
+    class TagCacheKey < Tag
+      def initialize(val)
+        super
+        @key = 'cache.key'
       end
     end
   end

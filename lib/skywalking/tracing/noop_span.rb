@@ -19,7 +19,7 @@ module Skywalking
   module Tracing
     class NoopSpan < Span
       def initialize(context: nil)
-        super(context: context, operation: '', kind: Tracing::Kind::EXIT)
+        super(context: context, operation: '', kind: Kind::Exit)
       end
 
       def extract(carrier) end

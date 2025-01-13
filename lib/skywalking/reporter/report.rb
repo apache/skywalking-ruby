@@ -14,7 +14,7 @@
 #  limitations under the License.
 
 require_relative 'grpc'
-require_relative 'Scheduler'
+require_relative 'scheduler'
 require_relative 'buffer_trigger'
 
 module Skywalking

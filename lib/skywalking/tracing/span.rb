@@ -21,7 +21,7 @@ module Skywalking
   module Tracing
     class Span
       attr_accessor :operation, :inherit, :component,
-        :context, :tags, :peer, :layer
+        :context, :tags, :peer, :layer, :error_occurred
 
       attr_reader :stack_depth, :kind, :parent_id,
         :start_time, :end_time, :span_id, :refs

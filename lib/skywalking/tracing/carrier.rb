@@ -20,7 +20,8 @@ module Skywalking
   module Tracing
     class Carrier < CarrierItem
       attr_reader :trace_id, :correlation_carrier, :service_instance,
-        :endpoint, :segment_id, :span_id, :peer
+        :endpoint, :segment_id, :span_id,
+        :peer, :items, :iter_index
 
       def initialize(
         trace_id: '',
@@ -47,7 +48,7 @@ module Skywalking
         @correlation_carrier.correlation = correlation unless correlation.nil?
       end
 
-      def val
+      def value
         [
           '1',
           Base64.strict_encode64(@trace_id),
@@ -56,11 +57,11 @@ module Skywalking
           Base64.strict_encode64(@service),
           Base64.strict_encode64(@service_instance),
           Base64.strict_encode64(@endpoint),
-          Base64.strict_encode64(@client_address)
+          Base64.strict_encode64(@peer)
         ].join('-')
       end
 
-      def val=(val)
+      def value=(val)
         @val = val
         return if val.nil? || val.empty?
 
@@ -73,13 +74,13 @@ module Skywalking
         @service = Base64.strict_decode64(parts[4])
         @service_instance = Base64.strict_decode64(parts[5])
         @endpoint = Base64.strict_decode64(parts[6])
-        @client_address = Base64.strict_decode64(parts[7])
+        @peer = Base64.strict_decode64(parts[7])
       end
 
       def valid?
         !@trace_id.empty? && !@segment_id.empty? && !@service.empty? &&
           !@service_instance.empty? && !@endpoint.empty? &&
-          !@client_address.empty? && @span_id.match?(/^\d+$/)
+          !@peer.empty? && @span_id.match?(/^\d+$/)
       end
 
       def suppressed?
@@ -99,13 +100,13 @@ module Skywalking
         @correlation = {}
       end
 
-      def val
+      def value
         return '' if @correlation.nil? || @correlation.empty?
 
         @correlation.map { |k, v| "#{Base64.strict_encode64(k)}:#{Base64.strict_encode64(v)}" }.join(',')
       end
 
-      def val=(val)
+      def value=(val)
         @val = val
         return if val.nil? || val.empty?
 
