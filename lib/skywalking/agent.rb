@@ -41,7 +41,9 @@ module Skywalking
           config ||= {}
           config = Configuration.new(config) unless config.is_a?(Configuration)
 
-          @agent = new(config.agent_config).start!
+          @logger = config.logger
+          @agent_config = config.agent_config
+          @agent = new(@agent_config).start!
           config.freeze
         end
       end
@@ -59,12 +61,10 @@ module Skywalking
         !!(defined?(@agent) && @agent)
       end
 
-      def config
-        @config ||= Configuration.new.agent_config
-      end
+      attr_reader :logger, :agent_config
     end
 
-    attr_reader :plugins, :logger, :reporter
+    attr_reader :plugins, :reporter
 
     def initialize(config)
       @plugins = Plugins::PluginsManager.new(config)

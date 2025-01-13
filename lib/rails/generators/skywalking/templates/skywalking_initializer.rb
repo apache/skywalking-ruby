@@ -13,19 +13,4 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-require 'sinatra'
-require 'redis'
-require 'skywalking'
-
 Skywalking.start
-
-get '/sw' do
-  "Hello, SkyWalking!"
-end
-
-get '/hello/:name' do
-  redis = Redis.new(host: 'localhost', port: 6379)
-  redis.set('hello', 'world')
-  value = redis.get("hello")
-  "Hello #{value}!"
-end

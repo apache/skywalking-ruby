@@ -15,12 +15,19 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# The service name in UI
-service_name: sw-ruby
-instance_name: Your_InstanceName  
+common: &defaults
+  service_name: Ruby-Agent-Common
+  log_level: debug
 
-# Whether to enable the reporter
-collector_discard: false
-# The gRPC server address of the backend service.
-collector_backend_services: 127.0.0.1:11800
-config_file: config/skywalking.yaml
+development:
+  <<: *defaults
+  service_name: Ruby-Agent-Development
+
+test:
+  <<: *defaults
+  service_name: Ruby-Agent-Test
+
+production:
+  <<: *defaults
+  service_name: Ruby-Agent-Production
+  

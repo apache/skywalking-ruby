@@ -20,27 +20,119 @@ module Skywalking
     include Singleton
     include Log::Logging
 
-    def framework_info
-      @framework_info ||= generate_framework_info
-    end
-
-    def generate_framework_info
-      if defined?(::Rails::Application)
+    class RailsFramework
+      def name
         :rails
-      elsif defined?(::Sinatra::Base)
-        :sinatra
-      else
-        :ruby
+      end
+
+      def present?
+        defined?(::Rails) && defined?(::Rails::VERSION)
+      end
+
+      def app_name
+        if defined?(::Rails)
+          ::Rails.application.class.to_s
+                 .sub(/::Application$/, '')
+        end
+      rescue
+        nil
+      end
+      
+      def env
+        ::Rails.env
       end
     end
+
+    class SinatraFramework
+      def name
+        :sinatra
+      end
+
+      def present?
+        defined?(::Sinatra) && defined?(::Sinatra::Base)
+      end
+
+      def app_name
+        candidate = ObjectSpace.each_object(Class).select { |klass| klass < ::Sinatra::Base } - [::Sinatra::Application]
+
+        if candidate.length == 1
+          candidate.first.name
+        else
+          "Sinatra"
+        end
+      rescue
+        "Sinatra"
+      end
+      
+      def env
+        ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development'
+      end
+    end
+
+    class RubyFramework
+      def name
+        :ruby
+      end
+
+      def present?
+        true
+      end
+
+      def app_name
+        "Ruby"
+      end
+      
+      def env
+        ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development'
+      end
+    end
+
+    FRAMEWORKS = [
+      RailsFramework.new,
+      SinatraFramework.new,
+      RubyFramework.new
+    ].freeze
+
+    def framework_info
+      @framework ||= FRAMEWORKS.detect { |candidate| candidate.present? }
+    end
+
+    def framework_name
+      @framework_name ||= framework_info.name
+    end
+
+    def framework_root
+      @framework_root ||= case @framework_name
+                          when :rails
+                            ::Rails.root
+                          when :sinatra
+                            Sinatra::Application.root || "."
+                          else
+                            "."
+                          end
+    end
     
-    def sinatra?
-      @framework_info = :sinatra
+    def framework_env
+      @framework_env ||= framework_info.env
+    end
+
+    def app_name
+      framework_info.app_name
+    end
+
+    def rails?
+      if defined?(::Rails)
+        ::Rails.application.class.to_s
+               .sub(/::Application$/, '')
+      end
+    rescue
+      nil
     end
 
     def shutdown_handler_supported?
-      if sinatra?
-        info "Shutdown handler not supported for Sinatra"
+      case framework_name
+      when :sinatra
+        warn "Shutdown handler not supported for Sinatra"
         false
       else
         true

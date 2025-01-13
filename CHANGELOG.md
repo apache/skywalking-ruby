@@ -7,6 +7,7 @@ Release Notes.
 #### Features
 - Initialize the ruby agent core.
 - Implement e2e tests.
+- Add docs.
 
 #### Plugins
 * Support [Sinatra](https://github.com/sinatra/sinatra)

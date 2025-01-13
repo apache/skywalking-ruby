@@ -29,6 +29,16 @@ module Skywalking
         default: 'Your_InstanceName',
         desc: 'The name of this particular awesome Ruby service instance'
       },
+      :namespace => {
+        type: :string,
+        default: '',
+        desc: 'The namespace of the service'
+      },
+      :environment => {
+        type: :string,
+        default: '',
+        desc: 'The name of the environment this service is deployed in'
+      },
       :collector_backend_services => {
         type: :string,
         default: '127.0.0.1:11800',
@@ -37,16 +47,16 @@ module Skywalking
       :config_file => {
         type: :string,
         default: '',
-        desc: 'The path to the config file'
+        desc: 'The absolute path to the configuration file'
       },
-      :log_file => {
+      :log_file_name => {
         type: :string,
-        default: 'skywalking.log',
+        default: 'skywalking',
         desc: 'The name of the log file'
       },
       :log_file_path => {
         type: :string,
-        default: 'STDOUT',
+        default: '',
         desc: 'The path to the log file'
       },
       :log_level => {
@@ -68,11 +78,6 @@ module Skywalking
         type: :string,
         default: '',
         desc: 'Ignore specific URL paths'
-      },
-      :namespace => {
-        type: :string,
-        default: '',
-        desc: 'The namespace of the service'
       },
       :instance_properties_json => {
         type: :string,
@@ -98,19 +103,24 @@ module Skywalking
     }.freeze
 
     # @api private
-    attr_reader :agent_config
+    attr_reader :agent_config, :logger
 
     def initialize(opts = {})
       @agent_config = {}
       initialize_config(opts)
+      if @logger.nil?
+        @logger ||= Mutex.new.synchronize { build_logger }
+      end
     end
 
     def initialize_config(opts)
       # from the default value
       merge_config(DEFAULTS.transform_values { |v| v[:default] })
+      # start parameters
       merge_config(opts)
       # from the custom config file
       merge_config(override_config_by_file)
+      # environment variables
       merge_config(override_config_by_env)
     end
 
@@ -124,10 +134,15 @@ module Skywalking
 
     def override_config_by_file
       config_yaml = @agent_config[:config_file]
-      return if config_yaml.nil? || config_yaml.empty?
+      if config_yaml.nil? || config_yaml.empty?
+        config_yaml = File.join(srv_root, "config", "skywalking.yml")
+      end
 
       unless File.exist?(config_yaml)
-        logger.warn "No config file found at #{config_yaml}"
+        return
+      end
+
+      unless srv_environment
         return
       end
 
@@ -140,10 +155,10 @@ module Skywalking
                       else
                         YAML.safe_load(erb_file, permitted_classes: [], permitted_symbols: [], aliases: true)
                       end
+        loaded_yaml = loaded_yaml[srv_environment]
         error = "Invalid format in config file" if loaded_yaml && !loaded_yaml.is_a?(Hash)
       rescue Exception => e
         error = e.message
-        logger.error "override config by file failed, error=%s", e.message
         nil
       end
       raise StandardError, "Error loading config file: #{config_yaml} - #{error}" if error
@@ -187,14 +202,18 @@ module Skywalking
       self
     end
 
+    def srv_environment
+      @agent_config[:environment].to_s.empty? ? Skywalking::Environment.instance.framework_env : @agent_config[:environment]
+    end
+
+    def srv_root
+      Skywalking::Environment.instance.framework_root
+    end
+
     #####
     # LOAD LOG
     #####
-    def logger
-      @logger ||= Mutex.new.synchronize { get_logger }
-    end
-
-    def get_logger
+    def build_logger
       return @logger if @logger
 
       log_dest = log_destination
@@ -203,17 +222,17 @@ module Skywalking
 
     def create_log(log_dest, level)
       if log_dest.is_a?(String)
-        log_dest = File.expand_path(out, Pathname.new(Dir.pwd).realpath)
+        log_dest = File.expand_path(log_dest, Pathname.new(Dir.pwd).realpath)
         FileUtils.mkdir_p(File.dirname(log_dest))
       end
 
       begin
-        logger = ::Logger.new(log_dest, progname: "Skywalking-Ruby", level: level)
+        logger = ::Logger.new(log_dest, progname: "Skywalking", level: level)
         logger.formatter = log_formatter
 
         logger
       rescue => e
-        logger = ::Logger.new($stdout, progname: "Skywalking-Ruby", level: level)
+        logger = ::Logger.new($stdout, progname: "Skywalking", level: level)
         logger.warn "Create logger for file #{log_dest} failed, using standard out for logging error=#{e.message}"
       end
     end
@@ -226,30 +245,32 @@ module Skywalking
     end
 
     def log_destination
-      if stdout?
+      candidate = @agent_config[:log_file_path].upcase
+
+      case candidate
+      when "STDOUT"
         $stdout
-      elsif !agent_config[:log_file].nil?
-        agent_config[:log_file]
-      elsif !agent_config[:log_file_path].nil?
-        "#{agent_config[:log_file_path]}/skywalking.log"
+      when "STDERR"
+        $stderr
+      when nil? || ''
+        $stdout
       else
-        $stdout
+        "#{@agent_config[:log_file_path]}/#{@agent_config[:log_file_name]}.log"
       end
     end
 
     def get_log_level
-      case @agent_config[:log_level]
+      candidate = @agent_config[:log_level].downcase
+
+      case candidate
       when "debug" then ::Logger::DEBUG
       when "info" then ::Logger::INFO
       when "warn" then ::Logger::WARN
       when "error" then ::Logger::ERROR
       when "fatal" then ::Logger::FATAL
+      when ::Logger::DEBUG, ::Logger::INFO, ::Logger::WARN, ::Logger::ERROR, ::Logger::FATAL then candidate
       else ::Logger::INFO
       end
-    end
-
-    def stdout?
-      @agent_config[:log_file_path] == "STDOUT"
     end
   end
 end

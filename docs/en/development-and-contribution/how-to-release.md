@@ -143,6 +143,8 @@ Vote result should follow these:
 1. Publish to rubygems.org, this is optional for Apache releases, but we usually want to do this to let users use it conveniently.
 
   ```shell
+  gem build skywalking.gemspec
+  gem push skywalking.gemspec
   ```
 
 **NOTE**: please double check before publishing to rubygems.org, it's difficult to unpublish and republish the module at the moment.
@@ -169,11 +171,10 @@ Vote result should follow these:
     Website: http://skywalking.apache.org/
 
     SkyWalking Ruby Resources:
-- Issue: https://github.com/apache/skywalking/issues
+    Issue: https://github.com/apache/skywalking/issues
+
     - Mailing list: dev@skywalking.apache.org
     - Documents: https://github.com/apache/skywalking-ruby/blob/v$VERSION/README.md
 
     The Apache SkyWalking Team
-```
-
-
+   ```
