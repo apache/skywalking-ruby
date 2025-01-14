@@ -29,7 +29,7 @@ module Skywalking
     
     it 'loads from yaml' do
       config = Configuration.new(config_file: 'spec/fixtures/agent.yaml').agent_config
-      expect(config[:service_name]).to eq 'sw-ruby'
+      expect(config[:service_name]).to eq 'Ruby-Agent-Development'
     end
     
     it 'loads from env' do

@@ -14,40 +14,34 @@
 #  limitations under the License.
 
 module Skywalking
-  module Log
-    module Logging
-      def info(msg, *args)
-        log(:info, msg, *args)
-      end
+  class StartGenerator < ::Rails::Generators::Base
+    source_root File.join(File.dirname(__FILE__), 'templates')
+    desc 'Creates a skywalking initializer'
 
-      def debug(msg, *args)
-        log(:debug, msg, *args)
-      end
+    @namespace = "skywalking:start"
 
-      def warn(msg, *args)
-        log(:warn, msg, *args)
-      end
+    def copy_initializer
+      print_header
+      print_footer
 
-      def error(msg, *args)
-        log(:error, msg, *args)
-      end
+      template "skywalking_initializer.rb", "config/initializers/skywalking.rb"
+    end
 
-      def log(level, msg, *args)
-        logger = Agent.logger
-        if logger
-          if logger.respond_to?(level)
-            if args.empty?
-              logger.send(level, msg)
-            else
-              logger.send(level, format(msg, *args))
-            end
-          else
-            Kernel.warn("Unknown log level: #{level}")
-          end
-        end
-      rescue Exception => e
-        puts "log exception: #{e.message}"
-      end
+    private
+
+    def print_header
+      say ""
+      say shell.set_color "Welcome to the SkyWalking Ruby Agent instrumentation setup.", :green, :bold
+      say ""
+    end
+
+    def print_footer
+      say ""
+      say "You can configure skywalking start parameters by modifying config/initializers/skywalking.rb."
+      say ""
+      say "Thanks for using! Welcome to contribute to the SkyWalking community."
+      say ""
     end
   end
 end
+

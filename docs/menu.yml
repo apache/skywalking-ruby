@@ -14,36 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: publish-docker
-
-on:
-  push:
-    branches:
-      - main
-
-env:
-  HUB: ghcr.io/apache/skywalking-ruby
-
-jobs:
-  build:
-    if: github.repository == 'apache/skywalking-ruby'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    timeout-minutes: 150
-    env:
-      VERSION: ${{ github.sha }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-      - name: Log in to the Container registry
-        uses: docker/login-action@v1.10.0
-        with:
-          registry: ${{ env.HUB }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Polish docker image
-        run: |
-          make docker.push || make docker.push
+catalog:
+  - name: SkyWalking Ruby Overview
+    path: /readme
+  - name: Quick Start
+    path: /en/setup/quick-start
+  - name: Agent
+    catalog:
+      - name: Supported Plugins
+        path: /en/agent/plugins
+  - name: Development and Contribution
+    catalog:
+      - name: How to Release
+        path: /en/development-and-contribution/how-to-release
+  - name: Changelog
+    path: https://github.com/apache/skywalking-ruby/blob/master/CHANGELOG.md

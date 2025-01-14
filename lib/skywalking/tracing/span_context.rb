@@ -36,7 +36,7 @@ module Skywalking
       end
 
       def cfg
-        @config ||= ::Skywalking::Agent.config
+        @config ||= ::Skywalking::Agent.agent_config
       end
 
       def ignore_check(operation, carrier: nil)
