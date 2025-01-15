@@ -34,7 +34,7 @@ module Skywalking
         Dir[File.join(__dir__, 'plugins', '*.rb')].each { |file| require file }
 
         installed_plugins = self.class.installed.keys
-        @enabled_plugins ||= installed_plugins - @config[:disable_plugins].split(',')
+        @enabled_plugins ||= installed_plugins - @config[:disable_plugins].split(',').map(&:to_sym)
         @enabled_plugins.each do |plugin_name|
           self.class.installed[plugin_name].try_install(plugin_name)
         end

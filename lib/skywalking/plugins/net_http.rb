@@ -35,7 +35,7 @@ module Skywalking
           Tracing::ContextManager.new_exit_span(
             operation: "#{method}:#{req_info}",
             peer: host,
-            component: Tracing::Component::Http
+            component: Tracing::Component::HttpClient
           ) do |span|
             span&.tag(Tracing::TagHttpMethod.new(method))
             span&.tag(Tracing::TagHttpURL.new(uri))

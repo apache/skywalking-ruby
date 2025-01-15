@@ -104,6 +104,7 @@ module Skywalking
 
         ref = SegmentRef.new(carrier)
         @refs << ref unless @refs.include?(ref)
+
         self
       end
     end

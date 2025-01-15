@@ -201,9 +201,9 @@ module Skywalking
           end
         end
 
-        def new_exit_span(operation:, peer: nil, component: nil, &block)
+        def new_exit_span(operation:, peer: nil, component: nil, inherit: nil, &block)
           context = current_context
-          span = context.new_exit_span(operation, peer, component: component)
+          span = context.new_exit_span(operation, peer, component: component, inherit: inherit)
           span&.start
 
           begin

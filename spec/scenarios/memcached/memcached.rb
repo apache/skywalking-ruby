@@ -13,27 +13,19 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-RSpec.shared_context 'scenario value' do
-  let(:data_validate_url) { 'http://localhost:12800/dataValidate' }
-  let(:receive_data_url) { 'http://localhost:12800/receiveData' }
+require_relative '../../../lib/skywalking'
+require 'sinatra'
+require 'dalli'
+
+Skywalking.start
+
+get "/execute" do
+  client = Dalli::Client.new('memcached:11211', { namespace: "sw", compress: true })
+  client.set('sw_key', 'sw_value')
+  value = client.get('sw_key')
+  p "The value for 'sw_key' is: #{value}"
+  client.delete('sw_key')
 end
 
-RSpec.shared_context 'compose' do
-  let(:client_url) { 'http://localhost:8080/execute' }
-
-  let(:compose) do
-    Testcontainers::ComposeContainer.new(
-      filepath: root_dir,
-      compose_filenames: ["docker-compose.yml"]
-    )
-  end
-
-  before(:each) do
-    compose.start
-    compose.wait_for_http(url: client_url, timeout: 800)
-  end
-
-  after(:each) do
-    compose.stop
-  end
-end
+set :bind, '0.0.0.0'
+set :port, 8080

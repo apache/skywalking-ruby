@@ -67,7 +67,7 @@ module Skywalking
       :disable_plugins => {
         type: :string,
         default: '',
-        desc: 'The plugins to disable'
+        desc: "The plugins to disable, multiple names should be split by comma, e.g. 'redis5,elasticsearch'"
       },
       :report_protocol => {
         type: :string,

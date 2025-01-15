@@ -13,27 +13,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-RSpec.shared_context 'scenario value' do
-  let(:data_validate_url) { 'http://localhost:12800/dataValidate' }
-  let(:receive_data_url) { 'http://localhost:12800/receiveData' }
-end
+require_relative '../common/common_spec_helper'
+require_relative '../common/compose_context'
 
-RSpec.shared_context 'compose' do
-  let(:client_url) { 'http://localhost:8080/execute' }
+RSpec.describe "Elasticsearch" do
+  include CommonSpecHelper
+  include_context 'compose'
+  include_context 'scenario value'
 
-  let(:compose) do
-    Testcontainers::ComposeContainer.new(
-      filepath: root_dir,
-      compose_filenames: ["docker-compose.yml"]
-    )
-  end
+  let(:root_dir) { File.expand_path(__dir__) }
 
-  before(:each) do
-    compose.start
-    compose.wait_for_http(url: client_url, timeout: 800)
-  end
-
-  after(:each) do
-    compose.stop
+  it 'test elasticsearch plugin' do
+    test_plugin('elasticsearch')
   end
 end

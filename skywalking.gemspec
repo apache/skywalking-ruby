@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   # Communication with OAP
-  spec.add_dependency 'grpc', '1.68.1'
+  spec.add_dependency 'grpc', '~> 1.68.0'
 
   # Base dev dependency
   spec.add_development_dependency 'bundler', '~> 2.0'
@@ -53,9 +53,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bigdecimal', '3.1.5'
 
   # E2E test dependency
-  spec.add_development_dependency 'redis', '~> 5.0'
-  spec.add_development_dependency 'sinatra', '~> 4.1'
   spec.add_development_dependency 'testcontainers-compose', '~> 0.2.0'
   spec.add_development_dependency 'faraday', '~> 2.12'
-  spec.add_development_dependency 'rspec-wait', '~> 1.0'
 end

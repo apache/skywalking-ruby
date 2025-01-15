@@ -1,0 +1,67 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+version: "2.1"
+
+services:
+  oap:
+    extends:
+      file: ../common/base-compose.yml
+      service: oap
+    networks:
+      - gem
+  
+  memcached:
+    image: memcached:1.6
+    hostname: memcached
+    ports:
+      - "11211:11211"
+    networks:
+      - gem
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "11211" ]
+      interval: 5s
+      timeout: 60s
+      retries: 120
+  
+  service:
+    extends:
+      file: ../common/base-compose.yml
+      service: agent
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app/spec/scenarios/memcached
+    environment:
+      SW_AGENT_SERVICE_NAME: "memcached"
+    healthcheck:
+      test: [ "CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/8080" ]
+      interval: 5s
+      timeout: 60s
+      retries: 120
+    entrypoint:
+      - "sh"
+      - "-c"
+      - "gem install sinatra rackup puma dalli && ruby /app/spec/scenarios/memcached/memcached.rb"
+    depends_on:
+      oap:
+        condition: service_healthy
+    networks:
+      - gem
+
+networks:
+  gem:
