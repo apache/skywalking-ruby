@@ -42,7 +42,8 @@ def delete_document(client, id)
 end
 
 get "/execute" do
-  client = Elasticsearch::Client.new(hosts: ['http://elasticsearch:9200'], log: true, transport_options: { request: { timeout: 5 } })
+  client = Elasticsearch::Client.new(hosts: ['http://elasticsearch:9200'], log: true, 
+    transport_options: { request: { timeout: 5 } })
   create_index(client)
   add_document(client, '1', 'Document 1')
   get_document(client, '1')
