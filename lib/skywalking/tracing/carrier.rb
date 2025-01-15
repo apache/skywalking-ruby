@@ -21,7 +21,7 @@ module Skywalking
     class Carrier < CarrierItem
       attr_reader :trace_id, :correlation_carrier, :service_instance,
         :endpoint, :segment_id, :span_id,
-        :peer, :items, :iter_index
+        :peer, :items, :iter_index, :service
 
       def initialize(
         trace_id: '',

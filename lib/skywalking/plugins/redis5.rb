@@ -30,7 +30,11 @@ module Skywalking
             span&.tag(Tracing::TagCacheOp.new(operation))
             span&.layer = Tracing::Layer::Cache
 
-            super(args, &block)
+            begin
+              super(args, &block)
+            rescue
+              span&.error_occurred = true
+            end
           end
         end
 

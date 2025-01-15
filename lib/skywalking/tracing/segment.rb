@@ -32,7 +32,7 @@ module Skywalking
       end
 
       def relate(trace_id)
-        @related_traces.shift if @related_traces.first.is_a?(Utils::IDGen.new)
+        @related_traces.pop if @related_traces[0].is_a?(Utils::IDGen)
         @related_traces << trace_id
       end
     end

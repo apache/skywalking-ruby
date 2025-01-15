@@ -21,13 +21,12 @@ module Skywalking
           req_method = @request.request_method if @request.respond_to?(:request_method)
           carrier = Tracing::Carrier.new
           carrier.each do |item|
-            item.val = request.env[item.key.capitalize] if request.env[item.key.capitalize]
+            item.value = request.env["HTTP_#{item.key.upcase}"]
           end
 
           Tracing::ContextManager.new_entry_span(
             operation: "#{req_method}:#{request.env['REQUEST_URI']}",
-            carrier: carrier,
-            inherit: Tracing::Component::General
+            carrier: carrier
           ) do |span|
             span&.tag(Tracing::TagHttpMethod.new(req_method))
             span&.tag(Tracing::TagHttpURL.new(request.env['REQUEST_URI']))
@@ -36,6 +35,8 @@ module Skywalking
             span&.component = Tracing::Component::Sinatra
 
             super(*args, &block)
+          rescue
+            span&.error_occurred = true
           end
         end
       end

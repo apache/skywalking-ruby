@@ -17,8 +17,10 @@ module Skywalking
   module Tracing
     module Component
       Unknown = 0
-      Http = 2
+      HttpClient = 2
       Redis = 7
+      Memcached = 20
+      Elasticsearch = 47
       General = 12000
       Sinatra = 12001
     end

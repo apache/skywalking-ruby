@@ -53,6 +53,13 @@ module Skywalking
       end
     end
 
+    class TagDbStatement < Tag
+      def initialize(val)
+        super
+        @key = 'db.statement'
+      end
+    end
+
     class TagCacheType < Tag
       def initialize(val)
         super
@@ -78,6 +85,13 @@ module Skywalking
       def initialize(val)
         super
         @key = 'cache.key'
+      end
+    end
+
+    class TagCacheMiss < Tag
+      def initialize(val)
+        super
+        @key = 'cache.miss'
       end
     end
   end
