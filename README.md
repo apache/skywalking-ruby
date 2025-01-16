@@ -8,8 +8,11 @@ Apache SkyWalking Ruby Agent
 **SkyWalking**: an APM(application performance monitor) system, especially designed for
 microservices, cloud native and container-based (Docker, Kubernetes, Mesos) architectures.
 
-# Documentation
+## Documentation
 - [Official documentation](https://skywalking.apache.org/docs/#RubyAgent)
+
+## Contributing
+Before submitting a pull request or pushing a commit, please read our [contributing](CONTRIBUTING.md).
 
 ## Contact Us
 * Submit [an issue](https://github.com/apache/skywalking/issues/new) by using [Ruby] as title prefix.
