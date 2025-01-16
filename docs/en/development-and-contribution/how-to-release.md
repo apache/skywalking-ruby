@@ -25,7 +25,7 @@ export VERSION=<the version to release>
 git clone --recurse-submodules git@github.com:apache/skywalking-ruby && cd skywalking-ruby
 git tag -a "v$VERSION" -m "Release Apache SkyWalking-Ruby $VERSION"
 git push --tags
-
+make release
 ```
 
 ## Upload to Apache svn
@@ -37,10 +37,16 @@ cp skywalking-ruby/skywalking*.tgz release/skywalking/ruby/"$VERSION"
 cp skywalking-ruby/skywalking*.tgz.asc release/skywalking/ruby/"$VERSION"
 cp skywalking-ruby/skywalking*.tgz.sha512 release/skywalking/ruby/"$VERSION"
 
-cd release/skywalking && svn add ruby/$VERSION && svn commit ruby -m "Draft Apache SkyWalking-Ruby release $VERSION"
+cd release/skywalking/ruby && svn add $VERSION && svn commit -m "Draft Apache SkyWalking-Ruby release $VERSION"
 ```
 
 ## Call for vote in dev@ mailing list
+
+First, generate a sha512sum for the source code package generated in last step:
+
+```shell
+sha512sum release/skywalking/ruby/"$VERSION"/skywalking-ruby-src-"$VERSION".tgz
+```
 
 Call for vote in `dev@skywalking.apache.org`.
 
@@ -51,6 +57,9 @@ Content:
 
 Hi the SkyWalking Community:
 This is a call for vote to release Apache SkyWalking Ruby version $VERSION.
+
+We welcome any comments you may have, and will take all feedback into
+account if a quality vote is called for this build.
 
 Release notes:
 
@@ -76,17 +85,10 @@ Keys to verify the Release Candidate :
 
 Guide to build the release from source :
 
- * https://github.com/apache/skywalking-ruby/blob/master/CONTRIBUTING.md#compiling-and-building
+ * https://github.com/apache/skywalking-ruby/blob/main/CONTRIBUTING.md#compiling-and-building
 
-Voting will start now and will remain open for at least 72 hours, all PMC members are required to give their votes.
-
-[ ] +1 Release this package.
-[ ] +0 No opinion.
-[ ] -1 Do not release this package because....
-
-Thanks.
-
-[1] https://github.com/apache/skywalking-ruby/blob/master/docs/How-to-release.md#vote-check
+A vote regarding the quality of this test build will be initiated
+within the next couple of days.
 ```
 
 ## Vote Check
