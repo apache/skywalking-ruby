@@ -13,6 +13,29 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+require 'sys/cpu'
+require_relative '../base'
+
 module Skywalking
-  VERSION = "0.2.0".freeze
+  module Meter
+    module Runtime
+      # DataSource for collecting CPU usage metrics
+      class CpuDataSource < DataSource
+        def initialize
+          @cpu_count = Sys::CPU.num_cpu || 1
+        end
+        
+        # Return current process CPU utilization percentage
+        def cpu_usage_percent_generator
+          # Use Sys::CPU load average as a simple metric
+          # This is similar to how Python's psutil works
+          load_avg = Sys::CPU.load_avg[0] # 1-minute load average
+          load_avg * 100.0 / @cpu_count
+          
+        rescue
+          0.0
+        end
+      end
+    end
+  end
 end

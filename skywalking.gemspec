@@ -43,6 +43,10 @@ Gem::Specification.new do |spec|
 
   # Communication with OAP
   spec.add_dependency 'grpc', '~> 1.68.0'
+  
+  # Meter dependencies
+  spec.add_dependency 'sys-cpu', '~> 1.0'
+  spec.add_dependency 'get_process_mem', '~> 0.2'
 
   # Base dev dependency
   spec.add_development_dependency 'bundler', '~> 2.0'

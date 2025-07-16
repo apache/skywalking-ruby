@@ -17,6 +17,7 @@ require_relative 'configuration'
 require_relative 'environment'
 require_relative 'plugins_manager'
 require_relative 'reporter/report'
+require_relative 'reporter/log_buffer_trigger'
 require_relative 'tracing/span_context'
 require_relative 'tracing/carrier_item'
 require_relative 'tracing/segment'
@@ -62,13 +63,21 @@ module Skywalking
       end
 
       attr_reader :logger, :agent_config
+      
+      # Get the singleton instance
+      # @return [Agent, nil] the agent instance or nil if not started
+      def instance
+        @agent
+      end
     end
 
-    attr_reader :plugins, :reporter
+    attr_reader :plugins, :reporter, :log_buffer, :config
 
     def initialize(config)
+      @config = config
       @plugins = Plugins::PluginsManager.new(config)
       @reporter = Reporter::Report.new(config)
+      @log_buffer = Reporter::LogBufferTrigger.new(config)
 
       add_shutdown_hook
     end
@@ -80,6 +89,9 @@ module Skywalking
     def start!
       @plugins.init_plugins
       @reporter.init_reporter
+      # Start log reporting thread
+      start_log_reporting_thread if @config[:log_reporter_active]
+
       self
     end
 
@@ -92,6 +104,45 @@ module Skywalking
 
       at_exit do
         shutdown
+      end
+    end
+
+    # Check if log reporter is active
+    # @return [Boolean] true if log reporter is active
+    def log_reporter_active?
+      @config[:log_reporter_active]
+    end
+
+    private
+
+    # Start the log reporting thread
+    def start_log_reporting_thread
+      Thread.new do
+        loop do
+          break unless log_reporter_active?
+          
+          process_log_queue
+          sleep @config[:log_report_period]
+        end
+      end
+    end
+
+    # Process the log queue and send data to the server
+    def process_log_queue
+      log_count = 0
+      Enumerator.new do |yielder|
+        while (log_data = log_buffer.stream_data)
+          log_data.each do |data| 
+            log_count += 1
+            yielder << data 
+          end
+        end
+      end.each_slice(10) do |batch|
+        begin
+          reporter.report_log(batch)
+        rescue => e
+          Agent.logger.warn "Failed to report log data: #{e.message}"
+        end
       end
     end
   end

@@ -13,6 +13,27 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+require_relative '../base'
+
 module Skywalking
-  VERSION = "0.2.0".freeze
+  module Meter
+    module Runtime
+      # DataSource for collecting thread metrics
+      class ThreadDataSource < DataSource
+        # Active thread count (alive threads)
+        def thread_count_active_generator
+          Thread.list.count(&:alive?)
+        rescue
+          0
+        end
+        
+        # Running thread count (threads in run state)
+        def thread_count_running_generator
+          Thread.list.count { |t| t.alive? && t.status == "run" }
+        rescue
+          0
+        end
+      end
+    end
+  end
 end

@@ -33,10 +33,11 @@ module Skywalking
 
           def report_instance_properties
             begin
+              properties = gen_service_instance
               req = InstanceProperties.new(
                 service: @config[:service_name],
                 serviceInstance: @config[:instance_name],
-                properties: gen_service_instance
+                properties: properties
               )
 
               @management_service.report_instance_properties(req)
@@ -106,6 +107,49 @@ module Skywalking
             @trace_service.collect(enumerator)
           rescue Exception => e
             error "Error to report trace segment: #{e.message}}"
+          end
+        end
+
+        class MeterReportServiceGrpc
+          include Log::Logging
+
+          def initialize(config)
+            @config = config
+            @meter_service ||= MeterReportServiceStub.new(
+              @config[:collector_backend_services],
+              :this_channel_is_insecure
+            )
+          end
+
+          def report_meter(enumerator)
+            @meter_service.collect(enumerator)
+          rescue Exception => e
+            error "Error to report meter data: #{e.message}"
+          end
+        end
+
+        class LogReportServiceGrpc
+          include Log::Logging
+
+          def initialize(config)
+            @config = config
+            @log_service ||= V3::LogReportService::Stub.new(
+              @config[:collector_backend_services],
+              :this_channel_is_insecure
+            )
+          end
+
+          def report_log(log_data_array)
+            return if log_data_array.nil? || log_data_array.empty?
+            
+            # Create an enumerator that yields log data
+            enumerator = Enumerator.new do |yielder|
+              log_data_array.each { |log_data| yielder << log_data }
+            end
+            
+            @log_service.collect(enumerator)
+          rescue Exception => e
+            error "Error to report log data: #{e.message}"
           end
         end
       end

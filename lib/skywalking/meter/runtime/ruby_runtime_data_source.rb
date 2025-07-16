@@ -13,6 +13,34 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+require_relative '../base'
+
 module Skywalking
-  VERSION = "0.2.0".freeze
+  module Meter
+    module Runtime
+      # Enhanced Ruby-specific runtime metrics
+      class RubyRuntimeDataSource < DataSource
+        # Total allocated objects
+        def total_allocated_objects_generator
+          GC.stat[:total_allocated_objects] || 0
+        rescue
+          0
+        end
+        
+        # Heap live slots count - important for memory pressure
+        def heap_live_slots_count_generator
+          GC.stat[:heap_live_slots] || 0
+        rescue
+          0
+        end
+        
+        # Heap allocated slots count - total capacity
+        def heap_allocated_slots_count_generator
+          GC.stat[:heap_allocated_slots] || 0
+        rescue
+          0
+        end
+      end
+    end
+  end
 end

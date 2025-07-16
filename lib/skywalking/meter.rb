@@ -13,6 +13,26 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+require_relative 'meter/base'
+require_relative 'meter/meter_service'
+require_relative 'meter/runtime/cpu_data_source'
+require_relative 'meter/runtime/mem_data_source'
+require_relative 'meter/runtime/gc_data_source'
+require_relative 'meter/runtime/thread_data_source'
+
 module Skywalking
-  VERSION = "0.2.0".freeze
+  # Main module for meter functionality
+  module Meter
+    # Export key classes for external use
+    DataSource = DataSource
+    Gauge = Gauge
+    MeterService = MeterService
+    
+    module Runtime
+      CpuDataSource = CpuDataSource
+      MemDataSource = MemDataSource
+      GcDataSource = GcDataSource
+      ThreadDataSource = ThreadDataSource
+    end
+  end
 end
