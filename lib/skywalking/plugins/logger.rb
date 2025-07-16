@@ -74,7 +74,7 @@ module Skywalking
           begin
             collect_log_data(severity, message, progname, &block)
           rescue => e
-            $stderr.puts "SkyWalking log collection error: #{e.message}" if $DEBUG
+            warn "SkyWalking log collection error: #{e.message}" if $DEBUG
           ensure
             # Always clear the flag
             Thread.current[COLLECTING_LOG_KEY] = false

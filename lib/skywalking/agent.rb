@@ -130,14 +130,16 @@ module Skywalking
     # Process the log queue and send data to the server
     def process_log_queue
       log_count = 0
-      Enumerator.new do |yielder|
+      enumerator = Enumerator.new do |yielder|
         while (log_data = log_buffer.stream_data)
           log_data.each do |data| 
             log_count += 1
             yielder << data 
           end
         end
-      end.each_slice(10) do |batch|
+      end
+      
+      enumerator.each_slice(10) do |batch|
         begin
           reporter.report_log(batch)
         rescue => e

@@ -23,16 +23,7 @@ require_relative 'meter/runtime/thread_data_source'
 module Skywalking
   # Main module for meter functionality
   module Meter
-    # Export key classes for external use
-    DataSource = DataSource
-    Gauge = Gauge
-    MeterService = MeterService
-    
-    module Runtime
-      CpuDataSource = CpuDataSource
-      MemDataSource = MemDataSource
-      GcDataSource = GcDataSource
-      ThreadDataSource = ThreadDataSource
-    end
+    # Classes are already defined through require statements above
+    # No need to reassign them to themselves
   end
 end
