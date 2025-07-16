@@ -19,6 +19,29 @@ gem "skywalking"
 
 Besides, you can also make installation as simple as `gem install skywalking`.
 
+## Installing from Source Code
+
+**Download the source tar from the [official website](http://skywalking.apache.org/downloads/), and run the following commands to build from source**
+
+**Make sure you have Ruby 3.0+ and the `gem` command available**
+
+~~~shell
+tar -zxf skywalking-ruby-src-<version>.tgz
+cd skywalking-ruby-src-<version>
+gem build skywalking.gemspec
+~~~
+
+If successful, the following will be displayed:
+
+```ruby
+  Successfully built RubyGem
+  Name: skywalking
+  Version: <version>
+  File: skywalking-<version>.gem
+```
+
+Then you can use `skywalking-<version>.gem` to your gemfile.
+
 ## Getting started with Rails
 
 You need to manually add `Skywalking.start` under config/initializers directory.
