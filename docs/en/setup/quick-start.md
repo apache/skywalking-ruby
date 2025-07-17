@@ -33,7 +33,7 @@ gem build skywalking.gemspec
 
 If successful, the following will be displayed:
 
-```ruby
+```shell
   Successfully built RubyGem
   Name: skywalking
   Version: <version>
@@ -84,27 +84,39 @@ The following is an example of configuration at start:
 Skywalking.start(
   service_name: 'sw-srv',
   instance_name: 'sw-inst',
-  collector_backend_services: 'oap:11800'
+  collector_backend_services: 'oap:11800',
+  meter_reporter_active: true,
+  log_reporter_active: true,
+  meter_report_period: 30,
+  log_report_period: 10
 )
 ~~~
 
 The following is an example of a configuration file:
+
 ~~~yaml
 common: &defaults
   service_name: Ruby-Agent-Common
   log_level: debug
+  meter_reporter_active: true
+  log_reporter_active: true
+  meter_report_period: 20
+  log_report_period: 5
 
 development:
   <<: *defaults
   service_name: Ruby-Agent-Development
+  log_reporter_level: 0  # DEBUG
 
 test:
   <<: *defaults
   service_name: Ruby-Agent-Test
+  log_reporter_level: 1  # INFO
 
 production:
   <<: *defaults
   service_name: Ruby-Agent-Production
+  log_reporter_level: 2  # WARN
 ~~~
 
 The following lists all the configuration options:
@@ -127,3 +139,10 @@ The following lists all the configuration options:
 | collector_heartbeat_period      | SW_AGENT_COLLECTOR_HEARTBEAT_PERIOD      | 30                   | he agent will send heartbeat to OAP every `collector_heartbeat_period` seconds.                                                           |
 | properties_report_period_factor | SW_AGENT_PROPERTIES_REPORT_PERIOD_FACTOR | 10                   | The agent will report service instance properties every `collector_heartbeat_period * properties_report_period_factor` seconds.           |
 | max_queue_size                  | SW_AGENT_MAX_QUEUE_SIZE                  | 10000                | The maximum queue size for reporting data.                                                                                                |
+| meter_reporter_active           | SW_AGENT_METER_REPORTER_ACTIVE           | true                 | Enable/disable meter reporter for runtime metrics collection.                                                                             |
+| meter_report_period             | SW_AGENT_METER_REPORT_PERIOD             | 20                   | Meter report period in seconds.                                                                                                           |
+| max_meter_queue_size            | SW_AGENT_MAX_METER_QUEUE_SIZE            | 1000                 | Maximum meter queue size for buffering metrics data.                                                                                      |
+| log_reporter_active             | SW_AGENT_LOG_REPORTER_ACTIVE             | true                 | Enable/disable log reporter for log collection.                                                                                           |
+| log_reporter_level              | SW_AGENT_LOG_REPORTER_LEVEL              | 1 (INFO)             | Minimum log level to report (Logger::DEBUG=0, INFO=1, WARN=2, ERROR=3, FATAL=4).                                                          |
+| log_report_period               | SW_AGENT_LOG_REPORT_PERIOD               | 5                    | Log report period in seconds.                                                                                                             |
+| max_log_queue_size              | SW_AGENT_MAX_LOG_QUEUE_SIZE              | 1000                 | Maximum log queue size for buffering log data.                                                                                            |
