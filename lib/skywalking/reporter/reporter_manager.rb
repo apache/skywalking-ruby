@@ -18,7 +18,7 @@ module Skywalking
     # Manages all reporters in a more elegant way using dependency injection
     class ReporterManager
       include Log::Logging
-      
+
       attr_reader :reporters, :triggers
 
       def initialize(config, protocol)
@@ -61,7 +61,7 @@ module Skywalking
       # Stop all reporters
       def stop
         @running = false
-        
+
         @triggers.each_value(&:close_queue)
         @threads.each do |thread|
           thread.join(5) if thread.alive?

@@ -19,7 +19,7 @@ module Skywalking
       def report_heartbeat
         raise NotImplementedError 'The report_heartbeat method has not been implemented'
       end
-      
+
       def report_segment
         raise NotImplementedError 'The report_segment method has not been implemented'
       end

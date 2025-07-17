@@ -37,7 +37,7 @@ module Skywalking
       rescue
         nil
       end
-      
+
       def env
         ::Rails.env
       end
@@ -63,7 +63,7 @@ module Skywalking
       rescue
         "Sinatra"
       end
-      
+
       def env
         ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development'
       end
@@ -81,7 +81,7 @@ module Skywalking
       def app_name
         "Ruby"
       end
-      
+
       def env
         ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development'
       end
@@ -111,7 +111,7 @@ module Skywalking
                             "."
                           end
     end
-    
+
     def framework_env
       @framework_env ||= framework_info.env
     end

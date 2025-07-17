@@ -23,6 +23,11 @@ module Skywalking
       class MemDataSource < DataSource
         def initialize
           @process_mem = GetProcessMem.new
+          @cached_total_memory = nil
+          @cache_time = 0
+          @cache_duration = 60
+          @ffi_loaded = false
+          load_ffi_if_available
         end
 
         # Process RSS (Resident Set Size) in MB
@@ -32,42 +37,99 @@ module Skywalking
           0.0
         end
 
+        # Process memory usage percentage
+        def memory_usage_percent_generator
+          rss_bytes = @process_mem.bytes
+          total_memory = get_total_memory
+
+          if total_memory && total_memory > 0
+            (rss_bytes.to_f / total_memory * 100).round(2)
+          end
+        rescue
+          nil
+        end
+
         private
 
-        # Parse /proc/meminfo on Linux or use system commands on macOS
-        # @return [Hash] memory info with :total and :available in bytes
-        def parse_meminfo
+        # Load FFI if available for more efficient system calls
+        def load_ffi_if_available
+          require 'ffi'
+          @ffi_loaded = true
+        rescue LoadError
+          @ffi_loaded = false
+        end
+
+        # Get total system memory with caching to avoid frequent system calls
+        def get_total_memory
+          current_time = Time.now.to_i
+
+          if @cached_total_memory.nil? || (current_time - @cache_time) > @cache_duration
+            @cached_total_memory = fetch_total_memory
+            @cache_time = current_time
+          end
+
+          @cached_total_memory
+        end
+
+        # Fetch total memory using platform-specific methods
+        def fetch_total_memory
           if RUBY_PLATFORM.include?('linux')
-            parse_proc_meminfo
+            fetch_linux_total_memory
           elsif RUBY_PLATFORM.include?('darwin')
-            parse_macos_memory
-          else
-            { total: 0, available: 0 }
+            fetch_macos_total_memory
           end
         end
 
-        def parse_proc_meminfo
+        # Fetch total memory on Linux using /proc/meminfo
+        def fetch_linux_total_memory
           meminfo = File.read('/proc/meminfo')
-          total = meminfo.match(/MemTotal:\s+(\d+)/)&.captures&.first.to_i * 1024
-          available = meminfo.match(/MemAvailable:\s+(\d+)/)&.captures&.first.to_i * 1024
-          { total: total, available: available }
+          total = (meminfo.match(/MemTotal:\s+(\d+)/)&.captures&.first || '0').to_i * 1024
+          total > 0 ? total : nil
         rescue
-          { total: 0, available: 0 }
+          nil
         end
 
-        def parse_macos_memory
-          vm_stat = `vm_stat`
-          page_size = vm_stat.match(/page size of (\d+) bytes/)&.captures&.first.to_i || 4096
-          
-          free = vm_stat.match(/Pages free:\s+(\d+)/)&.captures&.first.to_i * page_size
-          inactive = vm_stat.match(/Pages inactive:\s+(\d+)/)&.captures&.first.to_i * page_size
-          
-          total = `sysctl -n hw.memsize`.strip.to_i
-          available = free + inactive
-          
-          { total: total, available: available }
+        # Fetch total memory on macOS using sysctl
+        def fetch_macos_total_memory
+          if @ffi_loaded
+            result = fetch_macos_total_memory_ffi
+            return result if result
+          end
+
+          fetch_macos_total_memory_sysctl
+        end
+
+        # Use FFI to call sysctl directly
+        def fetch_macos_total_memory_ffi
+          extend FFI::Library
+          ffi_lib 'c'
+
+          attach_function :sysctl, [:pointer, :uint, :pointer, :pointer, :pointer, :size_t], :int
+
+          # sysctlnametomib for hw.memsize
+          mib = FFI::MemoryPointer.new(:int, 2)
+          mib.put_int(0, 6) # CTL_HW
+          mib.put_int(4, 24) # HW_MEMSIZE
+
+          size = FFI::MemoryPointer.new(:size_t)
+          size.put_size_t(0, 8)
+
+          result = FFI::MemoryPointer.new(:uint64_t)
+
+          if sysctl(mib, 2, result, size, nil, 0) == 0
+            value = result.read_uint64
+            value > 0 ? value : nil
+          end
         rescue
-          { total: 0, available: 0 }
+          nil
+        end
+
+        # Fallback to sysctl command (still forks but cached)
+        def fetch_macos_total_memory_sysctl
+          result = `sysctl -n hw.memsize 2>/dev/null`.strip.to_i
+          result > 0 ? result : nil
+        rescue
+          nil
         end
       end
     end

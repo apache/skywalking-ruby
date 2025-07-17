@@ -10,20 +10,21 @@ The agent automatically collects Ruby runtime metrics when `meter_reporter_activ
 
 **CPU Metrics:**
 
-- `instance_ruby_cpu_usage_percent` - Ruby process CPU usage percentage (based on load average)
+- `instance_ruby_cpu_usage_percent` - Ruby process CPU usage percentage
 
 **Memory Metrics:**
 
 - `instance_ruby_memory_rss_mb` - Ruby process RSS memory usage in MB
+- `instance_ruby_memory_usage_percent` - Ruby process memory usage percentage
 
 **Garbage Collection Metrics:**
 
 - `instance_ruby_gc_count_total` - Total GC execution count
 - `instance_ruby_gc_minor_count_total` - Minor GC count (if available)
 - `instance_ruby_gc_major_count_total` - Major GC count (if available)
+- `instance_ruby_gc_time_total` - Total GC time in milliseconds (cumulative)
 - `instance_ruby_heap_usage_percent` - Heap memory usage percentage
 - `instance_ruby_heap_live_slots_count` - Number of live heap slots
-- `instance_ruby_heap_allocated_slots_count` - Number of allocated heap slots
 
 **Object System Metrics:**
 
@@ -31,7 +32,8 @@ The agent automatically collects Ruby runtime metrics when `meter_reporter_activ
 
 **Thread Metrics:**
 
-- `instance_ruby_thread_count_active` - Number of active threads
+- `instance_ruby_thread_count_active` - Number of active threads (all alive threads)
+- `instance_ruby_thread_count_running` - Number of threads in running state
 
 ### Log Integration
 

@@ -59,26 +59,26 @@ module Skywalking
 
         # Initialize reporter manager
         @reporter_manager = ReporterManager.new(@config, @protocol)
-        
+
         # Register segment reporter
         segment_trigger = BufferTrigger.new(@config)
         @reporter_manager.register_reporter(:segment, segment_trigger, :report_segment)
-        
+
         # Register meter reporter if enabled
         if @config[:meter_reporter_active]
           meter_trigger = MeterBufferTrigger.new(@config)
           @reporter_manager.register_reporter(:meter, meter_trigger, :report_meter)
-          
+
           # Initialize meter service
           @meter_service = Skywalking::Meter::MeterService.new(@config, meter_trigger)
-          
+
           if @config[:runtime_meter_reporter_active]
             register_runtime_data_sources
           end
-          
+
           @meter_service.start
         end
-        
+
         # Start all reporters
         @reporter_manager.start
       end
@@ -86,7 +86,11 @@ module Skywalking
       # Deprecated: Use instance method instead
       def self.trigger
         warn "[DEPRECATED] Report.trigger is deprecated. Use instance method 'trigger' instead."
-        nil
+        default_instance.trigger
+      end
+
+      def self.default_instance
+        @default_instance ||= new(Skywalking::Configuration.new)
       end
 
       def init_worker_loop
@@ -103,16 +107,16 @@ module Skywalking
       def report_heartbeat
         @protocol.report_heartbeat
       end
-      
+
       # Accessor methods for triggers
       def trigger
         @reporter_manager&.trigger(:segment)
       end
-      
+
       def meter_trigger
         @reporter_manager&.trigger(:meter)
       end
-      
+
       # Report log data to the backend
       # @param log_data_array [Array<LogData>] array of log data to report
       def report_log(log_data_array)
@@ -120,9 +124,9 @@ module Skywalking
       rescue => e
         warn "Failed to report log data: #{e.message}"
       end
-      
+
       private
-      
+
       def register_runtime_data_sources
         Skywalking::Meter::Runtime::CpuDataSource.new.register(@meter_service)
         Skywalking::Meter::Runtime::MemDataSource.new.register(@meter_service)

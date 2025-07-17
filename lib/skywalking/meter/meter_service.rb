@@ -61,8 +61,8 @@ module Skywalking
       private
 
       def run_collection_loop
-        period = @config[:meter_report_period] || 20
-        
+        period = @config[:meter_report_period]
+
         while @running
           begin
             collect_and_queue_metrics

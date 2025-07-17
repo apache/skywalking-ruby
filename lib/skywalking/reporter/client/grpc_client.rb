@@ -141,12 +141,12 @@ module Skywalking
 
           def report_log(log_data_array)
             return if log_data_array.nil? || log_data_array.empty?
-            
+
             # Create an enumerator that yields log data
             enumerator = Enumerator.new do |yielder|
               log_data_array.each { |log_data| yielder << log_data }
             end
-            
+
             @log_service.collect(enumerator)
           rescue Exception => e
             error "Error to report log data: #{e.message}"

@@ -22,7 +22,7 @@ module Skywalking
       module LoggerIntercept
         # Thread-local flag to prevent recursive log collection
         COLLECTING_LOG_KEY = :skywalking_collecting_log
-        
+
         # Map Logger severity levels to string names
         SEVERITY_NAMES = {
           ::Logger::DEBUG => 'DEBUG',
@@ -32,7 +32,7 @@ module Skywalking
           ::Logger::FATAL => 'FATAL',
           ::Logger::UNKNOWN => 'UNKNOWN'
         }.freeze
-        
+
         # Map severity names to levels
         SEVERITY_LEVELS = {
           'DEBUG' => ::Logger::DEBUG,
@@ -51,14 +51,14 @@ module Skywalking
         def add(severity, message = nil, progname = nil, &block)
           # Call original method first
           result = super
-          
+
           # Skip if we're already collecting logs to prevent recursion
           return result if Thread.current[COLLECTING_LOG_KEY]
-          
+
           # Skip if log reporter is not active
           agent = Agent.instance
           return result unless agent&.log_reporter_active?
-          
+
           # Check severity threshold
           configured_level = agent.config[:log_reporter_level]
           min_level = if configured_level.is_a?(String)
@@ -66,20 +66,20 @@ module Skywalking
                       else
                         configured_level || ::Logger::INFO
                       end
-          
+
           return result unless severity >= min_level
-          
+
           # Set flag to prevent recursion
           Thread.current[COLLECTING_LOG_KEY] = true
           begin
             collect_log_data(severity, message, progname, &block)
           rescue => e
-            warn "SkyWalking log collection error: #{e.message}" if $DEBUG
+            agent.logger.warn("SkyWalking log collection error: #{e.message}") if agent.config[:debug_mode]
           ensure
             # Always clear the flag
             Thread.current[COLLECTING_LOG_KEY] = false
           end
-          
+
           result
         end
 
@@ -110,9 +110,9 @@ module Skywalking
             trace_context = if context && !context.is_a?(Tracing::IgnoredContext) && context.segment
                               segment = context.segment
                               span = context.active_span
-                              
+
                               V3::TraceContext.new(
-                                traceId: segment.related_traces[0].to_s,
+                                traceId: segment.related_traces.first&.to_s,
                                 traceSegmentId: segment.segment_id.to_s,
                                 spanId: span ? span.span_id : -1
                               )
@@ -125,7 +125,7 @@ module Skywalking
           # Create log data
           agent = Agent.instance
           return unless agent # Safety check
-          
+
           log_data = V3::LogData.new(
             timestamp: (Time.now.to_f * 1000).to_i,
             service: agent.config[:service_name],

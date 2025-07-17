@@ -112,7 +112,7 @@ module Skywalking
       },
       :meter_report_period => {
         type: :int,
-        default: 20,
+        default: 60,
         desc: 'Meter report period in seconds'
       },
       :max_meter_queue_size => {
@@ -213,18 +213,18 @@ module Skywalking
         next if env_value.nil?
 
         type = env_schema[:type]
-        case type
-        when :string
-          new_config[env_key] = env_value.to_s
-        when :bool
-          # rubocop:disable Performance/CollectionLiteralInLoop
-          new_config[env_key] = !%w[0 false].include?(env_value.strip.downcase)
-          # rubocop:enable Performance/CollectionLiteralInLoop
-        when :int
-          new_config[env_key] = env_value.to_i
-        else
-          env_value
-        end
+        new_config[env_key] = case type
+                              when :string
+                                env_value.to_s
+                              when :bool
+                                # rubocop:disable Performance/CollectionLiteralInLoop
+                                !%w[0 false].include?(env_value.strip.downcase)
+                              # rubocop:enable Performance/CollectionLiteralInLoop
+                              when :int
+                                env_value.to_i
+                              else
+                                env_value
+                              end
       end
 
       new_config

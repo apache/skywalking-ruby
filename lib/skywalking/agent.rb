@@ -63,7 +63,7 @@ module Skywalking
       end
 
       attr_reader :logger, :agent_config
-      
+
       # Get the singleton instance
       # @return [Agent, nil] the agent instance or nil if not started
       def instance
@@ -120,7 +120,7 @@ module Skywalking
       Thread.new do
         loop do
           break unless log_reporter_active?
-          
+
           process_log_queue
           sleep @config[:log_report_period]
         end
@@ -132,13 +132,13 @@ module Skywalking
       log_count = 0
       enumerator = Enumerator.new do |yielder|
         while (log_data = log_buffer.stream_data)
-          log_data.each do |data| 
+          log_data.each do |data|
             log_count += 1
-            yielder << data 
+            yielder << data
           end
         end
       end
-      
+
       enumerator.each_slice(10) do |batch|
         begin
           reporter.report_log(batch)

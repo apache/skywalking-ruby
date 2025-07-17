@@ -20,25 +20,38 @@ module Skywalking
     module Runtime
       # Enhanced Ruby-specific runtime metrics
       class RubyRuntimeDataSource < DataSource
+        def initialize
+          @cached_stats = nil
+          @cache_time = 0
+          @cache_duration = 60
+        end
+
         # Total allocated objects
         def total_allocated_objects_generator
-          GC.stat[:total_allocated_objects] || 0
+          stats = get_gc_stats
+          stats[:total_allocated_objects] || 0
         rescue
           0
         end
-        
+
         # Heap live slots count - important for memory pressure
         def heap_live_slots_count_generator
-          GC.stat[:heap_live_slots] || 0
+          stats = get_gc_stats
+          stats[:heap_live_slots] || 0
         rescue
           0
         end
-        
-        # Heap allocated slots count - total capacity
-        def heap_allocated_slots_count_generator
-          GC.stat[:heap_allocated_slots] || 0
-        rescue
-          0
+
+        private
+
+        # Get cached GC statistics, refresh if cache is expired
+        def get_gc_stats
+          current_time = Time.now.to_i
+          if @cached_stats.nil? || (current_time - @cache_time) > @cache_duration
+            @cached_stats = GC.stat
+            @cache_time = current_time
+          end
+          @cached_stats
         end
       end
     end

@@ -26,7 +26,7 @@ module Skywalking
         rescue
           0
         end
-        
+
         # Running thread count (threads in run state)
         def thread_count_running_generator
           Thread.list.count { |t| t.alive? && t.status == "run" }

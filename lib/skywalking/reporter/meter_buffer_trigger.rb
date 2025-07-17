@@ -71,7 +71,7 @@ module Skywalking
       # @return [Enumerator, nil]
       def stream_data
         data_batch = []
-        
+
         # Collect up to 100 items or until timeout
         deadline = Time.now + 0.1
         while Time.now < deadline && data_batch.size < 100

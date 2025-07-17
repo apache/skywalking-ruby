@@ -47,6 +47,7 @@ Gem::Specification.new do |spec|
   # Meter dependencies
   spec.add_dependency 'sys-cpu', '~> 1.0'
   spec.add_dependency 'get_process_mem', '~> 0.2'
+  spec.add_dependency 'ffi', '~> 1.17', '>= 1.17.0'
 
   # Base dev dependency
   spec.add_development_dependency 'bundler', '~> 2.0'
