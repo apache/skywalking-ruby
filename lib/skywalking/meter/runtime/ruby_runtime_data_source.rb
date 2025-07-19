@@ -26,18 +26,18 @@ module Skywalking
           @cache_duration = 60
         end
 
-        # Total allocated objects
-        def total_allocated_objects_generator
-          stats = get_gc_stats
-          stats[:total_allocated_objects] || 0
-        rescue
-          0
-        end
-
         # Heap live slots count - important for memory pressure
         def heap_live_slots_count_generator
           stats = get_gc_stats
           stats[:heap_live_slots] || 0
+        rescue
+          0
+        end
+
+        # Heap available slots count - total capacity
+        def heap_available_slots_count_generator
+          stats = get_gc_stats
+          stats[:heap_available_slots] || 0
         rescue
           0
         end

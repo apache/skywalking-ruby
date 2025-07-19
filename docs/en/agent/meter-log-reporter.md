@@ -25,10 +25,7 @@ The agent automatically collects Ruby runtime metrics when `meter_reporter_activ
 - `instance_ruby_gc_time_total` - Total GC time in milliseconds (cumulative)
 - `instance_ruby_heap_usage_percent` - Heap memory usage percentage
 - `instance_ruby_heap_live_slots_count` - Number of live heap slots
-
-**Object System Metrics:**
-
-- `instance_ruby_total_allocated_objects` - Total allocated objects count
+- `instance_ruby_heap_available_slots_count` - Number of available heap slots
 
 **Thread Metrics:**
 
