@@ -16,12 +16,24 @@
 require_relative 'grpc'
 require_relative 'scheduler'
 require_relative 'buffer_trigger'
+require_relative 'meter_buffer_trigger'
+require_relative 'reporter_manager'
+require_relative '../meter/base'
+require_relative '../meter/meter_service'
+require_relative '../meter/runtime/cpu_data_source'
+require_relative '../meter/runtime/mem_data_source'
+require_relative '../meter/runtime/gc_data_source'
+require_relative '../meter/runtime/thread_data_source'
+require_relative '../meter/runtime/ruby_runtime_data_source'
 
 module Skywalking
   module Reporter
     class Report
       def initialize(config)
         @config = config
+        @meter_service = nil
+        @scheduler_loop = nil
+        @reporter_manager = nil
         init_proto
       end
 
@@ -37,22 +49,48 @@ module Skywalking
       end
 
       def init_reporter
-        @daemon_loop = []
-
+        # Initialize scheduler for heartbeat
         @scheduler_loop = Scheduler.new
-        @daemon_loop << Thread.new do
+        @scheduler_thread = Thread.new do
+          Thread.current.name = 'Scheduler'
           init_worker_loop
           @scheduler_loop.run
         end
 
-        @@trigger = BufferTrigger.new(@config)
-        @daemon_loop << Thread.new do
-          report_segment
+        # Initialize reporter manager
+        @reporter_manager = ReporterManager.new(@config, @protocol)
+
+        # Register segment reporter
+        segment_trigger = BufferTrigger.new(@config)
+        @reporter_manager.register_reporter(:segment, segment_trigger, :report_segment)
+
+        # Register meter reporter if enabled
+        if @config[:meter_reporter_active]
+          meter_trigger = MeterBufferTrigger.new(@config)
+          @reporter_manager.register_reporter(:meter, meter_trigger, :report_meter)
+
+          # Initialize meter service
+          @meter_service = Skywalking::Meter::MeterService.new(@config, meter_trigger)
+
+          if @config[:runtime_meter_reporter_active]
+            register_runtime_data_sources
+          end
+
+          @meter_service.start
         end
+
+        # Start all reporters
+        @reporter_manager.start
       end
 
+      # Deprecated: Use instance method instead
       def self.trigger
-        @@trigger
+        warn "[DEPRECATED] Report.trigger is deprecated. Use instance method 'trigger' instead."
+        default_instance.trigger
+      end
+
+      def self.default_instance
+        @default_instance ||= new(Skywalking::Configuration.new)
       end
 
       def init_worker_loop
@@ -60,22 +98,41 @@ module Skywalking
       end
 
       def stop
-        @scheduler_loop.shutdown
-        @@trigger.close_queue
-        @daemon_loop.each do |daemon|
-          if daemon.alive?
-            daemon.wakeup
-            daemon.join
-          end
-        end
+        @scheduler_loop&.shutdown
+        @scheduler_thread&.join(5)
+        @reporter_manager&.stop
+        @meter_service&.stop
       end
 
       def report_heartbeat
         @protocol.report_heartbeat
       end
 
-      def report_segment
-        @protocol.report_segment(@@trigger.stream_data) until @@trigger.closed?
+      # Accessor methods for triggers
+      def trigger
+        @reporter_manager&.trigger(:segment)
+      end
+
+      def meter_trigger
+        @reporter_manager&.trigger(:meter)
+      end
+
+      # Report log data to the backend
+      # @param log_data_array [Array<LogData>] array of log data to report
+      def report_log(log_data_array)
+        @protocol.report_log(log_data_array) if @protocol
+      rescue => e
+        warn "Failed to report log data: #{e.message}"
+      end
+
+      private
+
+      def register_runtime_data_sources
+        Skywalking::Meter::Runtime::CpuDataSource.new.register(@meter_service)
+        Skywalking::Meter::Runtime::MemDataSource.new.register(@meter_service)
+        Skywalking::Meter::Runtime::GcDataSource.new.register(@meter_service)
+        Skywalking::Meter::Runtime::ThreadDataSource.new.register(@meter_service)
+        Skywalking::Meter::Runtime::RubyRuntimeDataSource.new.register(@meter_service)
       end
     end
   end

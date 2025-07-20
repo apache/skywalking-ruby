@@ -23,6 +23,8 @@ module Skywalking
         @cfg = config
         @ms_client = Skywalking::Reporter::Client::GrpcClient::ManagementServiceGrpc.new(config)
         @trace_client = Skywalking::Reporter::Client::GrpcClient::TraceSegmentReportServiceGrpc.new(config)
+        @meter_client = Skywalking::Reporter::Client::GrpcClient::MeterReportServiceGrpc.new(config)
+        @log_client = Skywalking::Reporter::Client::GrpcClient::LogReportServiceGrpc.new(config)
         @send_properties_counter = 0
         @counter_mutex = Mutex.new
       end
@@ -40,6 +42,14 @@ module Skywalking
 
       def report_segment(enumerator)
         @trace_client.report_segment(enumerator)
+      end
+
+      def report_meter(enumerator)
+        @meter_client.report_meter(enumerator)
+      end
+
+      def report_log(log_data_array)
+        @log_client.report_log(log_data_array)
       end
     end
   end

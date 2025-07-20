@@ -100,6 +100,46 @@ module Skywalking
         default: 10000,
         desc: 'The maximum queue size for reporting data'
       },
+      :meter_reporter_active => {
+        type: :bool,
+        default: true,
+        desc: 'Enable meter reporter'
+      },
+      :runtime_meter_reporter_active => {
+        type: :bool,
+        default: true,
+        desc: 'Enable Ruby runtime meter reporter'
+      },
+      :meter_report_period => {
+        type: :int,
+        default: 60,
+        desc: 'Meter report period in seconds'
+      },
+      :max_meter_queue_size => {
+        type: :int,
+        default: 1000,
+        desc: 'Maximum meter queue size'
+      },
+      :log_reporter_active => {
+        type: :bool,
+        default: true,
+        desc: 'Enable log reporter'
+      },
+      :log_reporter_level => {
+        type: :int,
+        default: Logger::INFO,
+        desc: 'Minimum log level to report (Logger::DEBUG, Logger::INFO, Logger::WARN, Logger::ERROR, Logger::FATAL)'
+      },
+      :log_report_period => {
+        type: :int,
+        default: 5,
+        desc: 'Log report period in seconds'
+      },
+      :max_log_queue_size => {
+        type: :int,
+        default: 1000,
+        desc: 'Maximum log queue size'
+      }
     }.freeze
 
     # @api private
@@ -173,18 +213,18 @@ module Skywalking
         next if env_value.nil?
 
         type = env_schema[:type]
-        case type
-        when :string
-          new_config[env_key] = env_value.to_s
-        when :bool
-          # rubocop:disable Performance/CollectionLiteralInLoop
-          new_config[env_key] = !%w[0 false].include?(env_value.strip.downcase)
-          # rubocop:enable Performance/CollectionLiteralInLoop
-        when :int
-          new_config[env_key] = env_value.to_s
-        else
-          env_value
-        end
+        new_config[env_key] = case type
+                              when :string
+                                env_value.to_s
+                              when :bool
+                                # rubocop:disable Performance/CollectionLiteralInLoop
+                                !%w[0 false].include?(env_value.strip.downcase)
+                              # rubocop:enable Performance/CollectionLiteralInLoop
+                              when :int
+                                env_value.to_i
+                              else
+                                env_value
+                              end
       end
 
       new_config

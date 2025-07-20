@@ -147,7 +147,9 @@ module Skywalking
         spans.delete(span)
         @n_spans -= 1
         if @n_spans.zero?
-          Reporter::Report.trigger << @segment
+          if (trigger = Agent.instance&.reporter&.trigger)
+            trigger << @segment
+          end
           return true
         end
 

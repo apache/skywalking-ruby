@@ -61,7 +61,7 @@ services:
     entrypoint:
       - "sh"
       - "-c"
-      - "gem install sinatra rackup puma elasticsearch && ruby /app/spec/scenarios/elasticsearch/elasticsearch.rb"
+      - "gem install sinatra rackup puma elasticsearch:8.16.1 && ruby /app/spec/scenarios/elasticsearch/elasticsearch.rb"
     depends_on:
       oap:
         condition: service_healthy

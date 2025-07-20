@@ -2,6 +2,15 @@ Changes by Version
 ==================
 Release Notes.
 
+0.2.0
+------------------
+#### Features
+- Supports collecting metrics and logs.
+
+#### Plugins
+
+#### Documentation
+
 0.1.0
 ------------------
 #### Features

@@ -18,3 +18,7 @@ source 'https://rubygems.org'
 gemspec name: 'skywalking'
 
 ruby ">= 3.0.0"
+
+# Optional dependencies for enhanced performance
+# Uncomment the following line to enable FFI for better system call performance
+# gem 'ffi', '~> 1.17'

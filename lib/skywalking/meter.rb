@@ -13,16 +13,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-module Skywalking
-  module Reporter
-    class Protocol
-      def report_heartbeat
-        raise NotImplementedError 'The report_heartbeat method has not been implemented'
-      end
+require_relative 'meter/base'
+require_relative 'meter/meter_service'
+require_relative 'meter/runtime/cpu_data_source'
+require_relative 'meter/runtime/mem_data_source'
+require_relative 'meter/runtime/gc_data_source'
+require_relative 'meter/runtime/thread_data_source'
 
-      def report_segment
-        raise NotImplementedError 'The report_segment method has not been implemented'
-      end
-    end
+module Skywalking
+  # Main module for meter functionality
+  module Meter
+    # Classes are already defined through require statements above
+    # No need to reassign them to themselves
   end
 end

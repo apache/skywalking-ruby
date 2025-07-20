@@ -13,15 +13,26 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-module Skywalking
-  module Reporter
-    class Protocol
-      def report_heartbeat
-        raise NotImplementedError 'The report_heartbeat method has not been implemented'
-      end
+require_relative '../base'
 
-      def report_segment
-        raise NotImplementedError 'The report_segment method has not been implemented'
+module Skywalking
+  module Meter
+    module Runtime
+      # DataSource for collecting thread metrics
+      class ThreadDataSource < DataSource
+        # Active thread count (alive threads)
+        def thread_count_active_generator
+          Thread.list.count(&:alive?)
+        rescue
+          0
+        end
+
+        # Running thread count (threads in run state)
+        def thread_count_running_generator
+          Thread.list.count { |t| t.alive? && t.status == "run" }
+        rescue
+          0
+        end
       end
     end
   end

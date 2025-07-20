@@ -16,6 +16,10 @@
 require_relative '../../proto/management/Management_services_pb'
 require_relative '../../proto/language-agent/Tracing_services_pb'
 require_relative '../../proto/language-agent/Tracing_pb'
+require_relative '../../proto/language-agent/Meter_services_pb'
+require_relative '../../proto/language-agent/Meter_pb'
+require_relative '../../proto/logging/Logging_services_pb'
+require_relative '../../proto/logging/Logging_pb'
 
 module Skywalking
   ManagementServiceStub = Skywalking::V3::ManagementService::Stub
@@ -26,4 +30,10 @@ module Skywalking
   SpanObject = Skywalking::V3::SpanObject
   SegmentReference = Skywalking::V3::SegmentReference
   KeyStringValuePair = Skywalking::V3::KeyStringValuePair
+  MeterReportServiceStub = Skywalking::V3::MeterReportService::Stub
+  MeterData = Skywalking::V3::MeterData
+  MeterSingleValue = Skywalking::V3::MeterSingleValue
+  MeterHistogram = Skywalking::V3::MeterHistogram
+  MeterBucketValue = Skywalking::V3::MeterBucketValue
+  Label = Skywalking::V3::Label
 end
