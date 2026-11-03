@@ -26,7 +26,7 @@ services:
       - gem
   
   elasticsearch:
-    image: elasticsearch:8.0.0
+    image: elasticsearch:8.19.23
     hostname: elasticsearch
     ports:
       - "9200:9200"
@@ -64,6 +64,8 @@ services:
       - "gem install sinatra rackup puma elasticsearch:8.16.1 && ruby /app/spec/scenarios/elasticsearch/elasticsearch.rb"
     depends_on:
       oap:
+        condition: service_healthy
+      elasticsearch:
         condition: service_healthy
     networks:
       - gem
